@@ -4,188 +4,169 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Plus, Edit, AlertTriangle, Package, TrendingUp, TrendingDown } from "lucide-react";
-import { useState } from "react";
+import { Search, Package, AlertTriangle, CheckCircle, Edit } from "lucide-react";
+import { useState, useEffect } from "react";
+import { productService } from "@/lib/services";
+import ImageWithFallback from "@/components/ui/image-with-fallback";
 
-const inventoryData = [
-  {
-    id: 1,
-    name: "Wireless Headphones",
-    sku: "WH-001",
-    category: "Electronics",
-    currentStock: 45,
-    minStock: 10,
-    maxStock: 100,
-    reorderPoint: 15,
-    unitCost: "$150.00",
-    totalValue: "$6,750.00",
-    supplier: "TechCorp",
-    lastRestocked: "2024-01-10",
-    status: "in_stock",
-  },
-  {
-    id: 2,
-    name: "Smart Watch",
-    sku: "SW-002",
-    category: "Electronics",
-    currentStock: 8,
-    minStock: 10,
-    maxStock: 50,
-    reorderPoint: 12,
-    unitCost: "$200.00",
-    totalValue: "$1,600.00",
-    supplier: "WatchTech",
-    lastRestocked: "2024-01-05",
-    status: "low_stock",
-  },
-  {
-    id: 3,
-    name: "Running Shoes",
-    sku: "RS-003",
-    category: "Sports",
-    currentStock: 0,
-    minStock: 5,
-    maxStock: 75,
-    reorderPoint: 8,
-    unitCost: "$80.00",
-    totalValue: "$0.00",
-    supplier: "SportGear",
-    lastRestocked: "2023-12-20",
-    status: "out_of_stock",
-  },
-  {
-    id: 4,
-    name: "Coffee Maker",
-    sku: "CM-004",
-    category: "Home",
-    currentStock: 25,
-    minStock: 5,
-    maxStock: 40,
-    reorderPoint: 8,
-    unitCost: "$60.00",
-    totalValue: "$1,500.00",
-    supplier: "HomeTech",
-    lastRestocked: "2024-01-12",
-    status: "in_stock",
-  },
-  {
-    id: 5,
-    name: "Bluetooth Speaker",
-    sku: "BS-005",
-    category: "Electronics",
-    currentStock: 3,
-    minStock: 10,
-    maxStock: 60,
-    reorderPoint: 15,
-    unitCost: "$45.00",
-    totalValue: "$135.00",
-    supplier: "AudioTech",
-    lastRestocked: "2024-01-08",
-    status: "critical",
-  },
-];
+interface InventoryItem {
+  id: string;
+  _id: string;
+  name: string;
+  category: {
+    id: string;
+    name: string;
+  };
+  stock: number;
+  price: number;
+  is_active: boolean;
+  images: string[];
+  created_at: string;
+  updated_at: string;
+}
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "in_stock":
-      return "bg-green-100 text-green-800 hover:bg-green-200";
-    case "low_stock":
-      return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
-    case "out_of_stock":
-      return "bg-red-100 text-red-800 hover:bg-red-200";
-    case "critical":
-      return "bg-orange-100 text-orange-800 hover:bg-orange-200";
-    default:
-      return "bg-gray-100 text-gray-800 hover:bg-gray-200";
-  }
+const getStockStatus = (stock: number, isActive: boolean) => {
+  if (!isActive) return { status: "inactive", color: "bg-gray-100 text-gray-800" };
+  if (stock === 0) return { status: "out-of-stock", color: "bg-red-100 text-red-800" };
+  if (stock < 10) return { status: "low-stock", color: "bg-yellow-100 text-yellow-800" };
+  return { status: "in-stock", color: "bg-green-100 text-green-800" };
 };
 
-const getStockIcon = (currentStock: number, minStock: number) => {
-  if (currentStock === 0) return <AlertTriangle className="h-4 w-4 text-red-500" />;
-  if (currentStock <= minStock) return <TrendingDown className="h-4 w-4 text-yellow-500" />;
-  return <TrendingUp className="h-4 w-4 text-green-500" />;
+const getStockIcon = (stock: number, isActive: boolean) => {
+  if (!isActive) return Package;
+  if (stock === 0) return AlertTriangle;
+  if (stock < 10) return AlertTriangle;
+  return CheckCircle;
 };
 
 export function InventoryTable() {
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [updatingStock, setUpdatingStock] = useState<string | null>(null);
 
-  const filteredInventory = inventoryData.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.supplier.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter;
-    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
-    
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const response = await productService.getProducts({ page: 1, limit: 100 });
+        console.log('Inventory response:', response); // Debug log
 
-  const totalValue = inventoryData.reduce((sum, item) => {
-    return sum + parseFloat(item.totalValue.replace('$', '').replace(',', ''));
-  }, 0);
+        // Handle different response formats
+        if (response.products) {
+          setInventory(response.products);
+        } else if (Array.isArray(response)) {
+          setInventory(response);
+        } else {
+          setInventory([]);
+        }
+      } catch (err: any) {
+        console.error('Inventory error:', err);
+        setError('Failed to load inventory');
+        setInventory([]); // Ensure inventory is always an array
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const lowStockItems = inventoryData.filter(item => 
-    item.currentStock <= item.minStock && item.currentStock > 0
-  ).length;
+    fetchInventory();
+  }, []);
 
-  const outOfStockItems = inventoryData.filter(item => item.currentStock === 0).length;
+  const handleStockUpdate = async (productId: string, newStock: number) => {
+    try {
+      setUpdatingStock(productId);
+      await productService.updateInventory(productId, newStock);
+      
+      // Update local state
+      setInventory(inventory.map(item => 
+        item._id === productId ? { ...item, stock: newStock } : item
+      ));
+    } catch (err: any) {
+      alert('Failed to update stock');
+    } finally {
+      setUpdatingStock(null);
+    }
+  };
+
+  const filteredInventory = (inventory || []).filter(item =>
+    item?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item?.category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const totalProducts = (inventory || []).length;
+  const outOfStock = (inventory || []).filter(item => item?.stock === 0).length;
+  const lowStock = (inventory || []).filter(item => item?.stock > 0 && item?.stock < 10).length;
+  const inStock = (inventory || []).filter(item => item?.stock >= 10).length;
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Inventory Management</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Inventory Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Inventory Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Inventory Value</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalValue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Across {inventoryData.length} products
-            </p>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Package className="h-8 w-8 text-blue-600" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Products</p>
+                <p className="text-2xl font-bold">{totalProducts}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
-            <TrendingDown className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{lowStockItems}</div>
-            <p className="text-xs text-muted-foreground">
-              Need restocking soon
-            </p>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">In Stock</p>
+                <p className="text-2xl font-bold">{inStock}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{outOfStockItems}</div>
-            <p className="text-xs text-muted-foreground">
-              Immediate attention required
-            </p>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <AlertTriangle className="h-8 w-8 text-yellow-600" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Low Stock</p>
+                <p className="text-2xl font-bold">{lowStock}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{inventoryData.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Active inventory items
-            </p>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <AlertTriangle className="h-8 w-8 text-red-600" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Out of Stock</p>
+                <p className="text-2xl font-bold">{outOfStock}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -193,113 +174,101 @@ export function InventoryTable() {
       {/* Inventory Table */}
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle>Inventory Management</CardTitle>
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search inventory..."
-                  className="pl-10 w-full sm:w-[250px]"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-[140px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="in_stock">In Stock</SelectItem>
-                  <SelectItem value="low_stock">Low Stock</SelectItem>
-                  <SelectItem value="out_of_stock">Out of Stock</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-full sm:w-[140px]">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="Electronics">Electronics</SelectItem>
-                  <SelectItem value="Sports">Sports</SelectItem>
-                  <SelectItem value="Home">Home</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button className="w-full sm:w-auto">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Stock
-              </Button>
+          <div className="flex items-center justify-between">
+            <CardTitle>Inventory Details</CardTitle>
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8 w-64"
+              />
             </div>
           </div>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+          
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b">
                   <th className="text-left p-2">Product</th>
+                  <th className="text-left p-2">Category</th>
                   <th className="text-left p-2">Current Stock</th>
-                  <th className="text-left p-2">Stock Levels</th>
-                  <th className="text-left p-2">Unit Cost</th>
-                  <th className="text-left p-2">Total Value</th>
-                  <th className="text-left p-2">Supplier</th>
                   <th className="text-left p-2">Status</th>
+                  <th className="text-left p-2">Price</th>
+                  <th className="text-left p-2">Last Updated</th>
                   <th className="text-left p-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredInventory.map((item) => (
-                  <tr key={item.id} className="border-b hover:bg-gray-50">
-                    <td className="p-2">
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-muted-foreground">SKU: {item.sku}</p>
-                        <p className="text-xs text-muted-foreground">{item.category}</p>
-                      </div>
-                    </td>
-                    <td className="p-2">
-                      <div className="flex items-center space-x-2">
-                        {getStockIcon(item.currentStock, item.minStock)}
-                        <span className="font-medium">{item.currentStock}</span>
-                      </div>
-                    </td>
-                    <td className="p-2">
-                      <div className="text-sm">
-                        <p>Min: {item.minStock}</p>
-                        <p>Max: {item.maxStock}</p>
-                        <p className="text-muted-foreground">Reorder: {item.reorderPoint}</p>
-                      </div>
-                    </td>
-                    <td className="p-2 font-medium">{item.unitCost}</td>
-                    <td className="p-2 font-medium">{item.totalValue}</td>
-                    <td className="p-2">
-                      <div>
-                        <p className="font-medium">{item.supplier}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Last: {item.lastRestocked}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="p-2">
-                      <Badge className={getStatusColor(item.status)}>
-                        {item.status.replace('_', ' ')}
-                      </Badge>
-                    </td>
-                    <td className="p-2">
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
+                {filteredInventory.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="text-center p-4 text-muted-foreground">
+                      {searchTerm ? "No products found matching your search." : "No products found."}
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredInventory.map((item) => {
+                    const stockInfo = getStockStatus(item.stock, item.is_active);
+                    const StockIcon = getStockIcon(item.stock, item.is_active);
+                    
+                    return (
+                      <tr key={item._id} className="border-b">
+                        <td className="p-2">
+                          <div className="flex items-center space-x-3">
+                            <ImageWithFallback
+                              src={item.images.length > 0 ? `http://localhost:8080/${item.images[0]}` : undefined}
+                              alt={item.name}
+                              className="w-10 h-10 rounded object-cover"
+                              fallbackClassName="w-10 h-10 bg-gray-200 rounded flex items-center justify-center"
+                              fallbackContent={<Package className="h-5 w-5 text-gray-400" />}
+                            />
+                            <div>
+                              <p className="font-medium">{item.name}</p>
+                              <p className="text-sm text-muted-foreground">ID: {item._id}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-2">{item && item.category && item.category.name}</td>
+                        <td className="p-2">
+                          <div className="flex items-center space-x-2">
+                            <StockIcon className="h-4 w-4" />
+                            <span className="font-medium">{item.stock}</span>
+                          </div>
+                        </td>
+                        <td className="p-2">
+                          <Badge className={stockInfo.color}>
+                            {stockInfo.status.replace('-', ' ')}
+                          </Badge>
+                        </td>
+                        <td className="p-2">₹{(item.price || 0).toLocaleString()}</td>
+                        <td className="p-2">{formatDate(item.updated_at)}</td>
+                        <td className="p-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            disabled={updatingStock === item._id}
+                            onClick={() => {
+                              const newStock = prompt(`Update stock for ${item.name}:`, item.stock.toString());
+                              if (newStock !== null && !isNaN(Number(newStock))) {
+                                handleStockUpdate(item._id, Number(newStock));
+                              }
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
