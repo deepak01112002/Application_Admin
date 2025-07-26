@@ -22,6 +22,7 @@ import {
   AlertCircle,
   XCircle
 } from "lucide-react";
+import { invoiceService } from "@/lib/services";
 
 interface Invoice {
   _id: string;
@@ -89,93 +90,20 @@ export default function InvoicesPage() {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const sampleInvoices: Invoice[] = [
-          {
-            _id: "1",
-            invoiceNumber: "INV-2025-001",
-            customerName: "Rajesh Kumar",
-            customerEmail: "rajesh@example.com",
-            amount: 25000,
-            tax: 4500,
-            totalAmount: 29500,
-            status: "paid",
-            dueDate: "2025-02-15",
-            issueDate: "2025-01-15",
-            items: [
-              { name: "iPhone 15 Pro", quantity: 1, price: 25000, total: 25000 }
-            ],
-            createdAt: "2025-01-15"
-          },
-          {
-            _id: "2",
-            invoiceNumber: "INV-2025-002",
-            customerName: "Priya Sharma",
-            customerEmail: "priya@example.com",
-            amount: 15000,
-            tax: 2700,
-            totalAmount: 17700,
-            status: "pending",
-            dueDate: "2025-02-20",
-            issueDate: "2025-01-20",
-            items: [
-              { name: "Samsung Galaxy S24", quantity: 1, price: 15000, total: 15000 }
-            ],
-            createdAt: "2025-01-20"
-          },
-          {
-            _id: "3",
-            invoiceNumber: "INV-2025-003",
-            customerName: "Amit Singh",
-            customerEmail: "amit@example.com",
-            amount: 8000,
-            tax: 1440,
-            totalAmount: 9440,
-            status: "overdue",
-            dueDate: "2025-01-10",
-            issueDate: "2024-12-10",
-            items: [
-              { name: "OnePlus 12", quantity: 1, price: 8000, total: 8000 }
-            ],
-            createdAt: "2024-12-10"
-          },
-          {
-            _id: "4",
-            invoiceNumber: "INV-2025-004",
-            customerName: "Sunita Patel",
-            customerEmail: "sunita@example.com",
-            amount: 12000,
-            tax: 2160,
-            totalAmount: 14160,
-            status: "pending",
-            dueDate: "2025-02-25",
-            issueDate: "2025-01-25",
-            items: [
-              { name: "Xiaomi 14", quantity: 1, price: 12000, total: 12000 }
-            ],
-            createdAt: "2025-01-25"
-          },
-          {
-            _id: "5",
-            invoiceNumber: "INV-2025-005",
-            customerName: "Ravi Krishnan",
-            customerEmail: "ravi@example.com",
-            amount: 5000,
-            tax: 900,
-            totalAmount: 5900,
-            status: "cancelled",
-            dueDate: "2025-02-10",
-            issueDate: "2025-01-10",
-            items: [
-              { name: "Realme GT 6", quantity: 1, price: 5000, total: 5000 }
-            ],
-            createdAt: "2025-01-10"
-          }
-        ];
+        // Fetch real invoices from backend
+        const invoicesResponse = await invoiceService.getAllInvoices();
 
-        setInvoices(sampleInvoices);
-        setLoading(false);
+        if (invoicesResponse && Array.isArray(invoicesResponse)) {
+          setInvoices(invoicesResponse);
+        } else {
+          // No invoices found, show empty state
+          setInvoices([]);
+        }
       } catch (error) {
-        console.error('Error fetching invoices:', error);
+        console.error('Failed to fetch invoices:', error);
+        // Show empty state on error
+        setInvoices([]);
+      } finally {
         setLoading(false);
       }
     };
@@ -236,12 +164,11 @@ export default function InvoicesPage() {
     return (
       <AdminLayout currentPage="invoices">
         <div className="space-y-6">
-            <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold">Invoices Management</h1>
             <p className="text-muted-foreground">Loading invoices data...</p>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {[1, 2, 3, 4].map((i) => (
                   <Card key={i}>
                     <CardContent className="p-6">
@@ -252,27 +179,24 @@ export default function InvoicesPage() {
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-            </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-      <AdminLayout currentPage="invoices">
-        <div className="space-y-6">
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <div>
+    <AdminLayout currentPage="invoices">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
             <h1 className="text-3xl font-bold">Invoices Management</h1>
             <p className="text-muted-foreground">Manage invoices and billing operations.</p>
-              </div>
+          </div>
           <Button className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Invoice
-              </Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Invoice
+          </Button>
         </div>
 
       {/* Stats Cards */}
@@ -282,9 +206,9 @@ export default function InvoicesPage() {
             <div className="flex items-center">
               <Receipt className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Total Invoices</p>
-                <p className="text-2xl font-bold">{totalInvoices}</p>
-              </div>
+          <p className="text-sm font-medium text-muted-foreground">Total Invoices</p>
+          <p className="text-2xl font-bold">{totalInvoices}</p>
+      </div>
             </div>
           </CardContent>
         </Card>
@@ -294,9 +218,9 @@ export default function InvoicesPage() {
             <div className="flex items-center">
               <CheckCircle className="h-8 w-8 text-green-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Paid</p>
-                <p className="text-2xl font-bold">{paidInvoices}</p>
-              </div>
+          <p className="text-sm font-medium text-muted-foreground">Paid</p>
+          <p className="text-2xl font-bold">{paidInvoices}</p>
+      </div>
             </div>
           </CardContent>
         </Card>
@@ -306,9 +230,9 @@ export default function InvoicesPage() {
             <div className="flex items-center">
               <Clock className="h-8 w-8 text-yellow-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                <p className="text-2xl font-bold">{pendingInvoices}</p>
-              </div>
+          <p className="text-sm font-medium text-muted-foreground">Pending</p>
+          <p className="text-2xl font-bold">{pendingInvoices}</p>
+      </div>
             </div>
           </CardContent>
         </Card>
@@ -318,9 +242,9 @@ export default function InvoicesPage() {
             <div className="flex items-center">
               <DollarSign className="h-8 w-8 text-green-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
-                <p className="text-2xl font-bold">{formatCurrency(paidAmount)}</p>
-              </div>
+          <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
+          <p className="text-2xl font-bold">{formatCurrency(paidAmount)}</p>
+      </div>
             </div>
           </CardContent>
         </Card>
@@ -339,8 +263,8 @@ export default function InvoicesPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
-              </div>
-            </div>
+        </div>
+      </div>
             <div className="flex gap-2">
               <Button
                 variant={filterStatus === 'all' ? 'default' : 'outline'}
@@ -371,7 +295,7 @@ export default function InvoicesPage() {
                 Overdue ({overdueInvoices})
               </Button>
         </div>
-          </div>
+      </div>
         </CardContent>
       </Card>
 
@@ -397,26 +321,26 @@ export default function InvoicesPage() {
                 {filteredInvoices.map((invoice) => (
                   <tr key={invoice._id} className="border-b hover:bg-gray-50">
                     <td className="p-4">
-                      <div>
+        <div>
                         <div className="font-medium text-gray-900">{invoice.invoiceNumber}</div>
                         <div className="text-sm text-gray-500">
                           Issued: {formatDate(invoice.issueDate)}
-                        </div>
-                      </div>
+        </div>
+      </div>
                     </td>
                     <td className="p-4">
-                      <div>
+        <div>
                         <div className="font-medium">{invoice.customerName}</div>
                         <div className="text-sm text-gray-500">{invoice.customerEmail}</div>
-                      </div>
+        </div>
                     </td>
                     <td className="p-4">
-                      <div>
+        <div>
                         <div className="font-medium">{formatCurrency(invoice.totalAmount)}</div>
                         <div className="text-sm text-gray-500">
                           Tax: {formatCurrency(invoice.tax)}
-                        </div>
-                      </div>
+        </div>
+      </div>
                     </td>
                     <td className="p-4">
                       <Badge className={`${getStatusColor(invoice.status)} flex items-center gap-1 w-fit`}>
@@ -430,7 +354,7 @@ export default function InvoicesPage() {
                         {invoice.status === 'overdue' && (
                           <div className="text-red-600 font-medium">Overdue</div>
                         )}
-                      </div>
+        </div>
                     </td>
                     <td className="p-4">
                       <div className="flex space-x-2">
@@ -457,17 +381,15 @@ export default function InvoicesPage() {
               <div className="text-center py-8">
                 <Receipt className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-2 text-sm font-semibold text-gray-900">No invoices found</h3>
-                <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500">
                   {searchTerm ? 'Try adjusting your search criteria.' : 'Get started by creating your first invoice.'}
                 </p>
-              </div>
+        </div>
             )}
-          </div>
+        </div>
         </CardContent>
       </Card>
-          </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

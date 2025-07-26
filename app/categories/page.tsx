@@ -46,9 +46,9 @@ export default function CategoriesPage() {
       console.log('Categories API response:', response);
 
       // Handle different response structures
-      let categoriesData = [];
+      let categoriesData: any[] = [];
       if (response) {
-        categoriesData = response.categories || response.data || response || [];
+        categoriesData = (response as any).categories || (response as any).data || response || [];
       }
 
       // Ensure we have an array
@@ -107,7 +107,7 @@ export default function CategoriesPage() {
 
   const handleToggleStatus = async (categoryId: string, currentStatus: boolean) => {
     try {
-      await categoryService.updateCategory(categoryId, { isActive: !currentStatus });
+      await categoryService.updateCategory(categoryId, { isActive: !currentStatus } as any);
       toast.success(`Category ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
       fetchCategories();
     } catch (error) {
@@ -236,7 +236,7 @@ export default function CategoriesPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {formatDate(category.createdAt)}
+                    {category.createdAt ? formatDate(category.createdAt) : 'N/A'}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
@@ -250,7 +250,7 @@ export default function CategoriesPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleToggleStatus(category._id, category.isActive)}
+                        onClick={() => handleToggleStatus(category._id, category.isActive ?? true)}
                       >
                         {category.isActive ? (
                           <ToggleRight className="w-4 h-4 text-green-600" />
@@ -313,7 +313,7 @@ export default function CategoriesPage() {
           </DialogHeader>
           {editingCategory && (
             <EditCategoryForm
-              category={editingCategory}
+              category={editingCategory as any}
               onClose={() => {
                 setShowEditModal(false);
                 setEditingCategory(null);

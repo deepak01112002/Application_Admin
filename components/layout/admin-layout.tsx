@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/ui/sidebar";
+import { authService } from "@/lib/services";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -11,16 +12,38 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayoutProps) {
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    // Set default admin user
-    setCurrentUser({
-      name: "Admin User",
-      email: "admin@ghanshyambhandar.com",
-      avatar: null
-    });
-  }, []);
+    // Fetch real user data from backend
+    const fetchUserData = async () => {
+      try {
+        const profile = await authService.checkAuthAndGetProfile();
+        if (profile && profile.user.role === 'admin') {
+          setCurrentUser({
+            name: profile.user.firstName && profile.user.lastName
+              ? `${profile.user.firstName} ${profile.user.lastName}`
+              : profile.user.name || 'Admin User',
+            email: profile.user.email,
+            avatar: null,
+            role: profile.user.role
+          });
+        } else {
+          // Not authenticated or not admin, redirect to login
+          router.push('/');
+        }
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        // Redirect to login on error
+        router.push('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [router]);
 
   const handleNavigate = (page: string) => {
     // Navigate using Next.js router for proper SPA navigation
@@ -76,11 +99,33 @@ export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayout
     }
   };
 
-  const handleLogout = () => {
-    // Handle logout logic
-    console.log("Logout clicked");
-    // You can add actual logout logic here
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      // The logout function will handle redirect
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force redirect even if logout fails
+      router.push('/');
+    }
   };
+
+  // Show loading state while fetching user data
+  if (loading) {
+    return (
+      <div className="flex h-screen bg-gray-50 items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if no user data (will redirect)
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">

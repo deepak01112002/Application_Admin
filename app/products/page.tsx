@@ -114,7 +114,7 @@ export default function ProductsPage() {
 
   const handleToggleStatus = async (productId: string, currentStatus: boolean) => {
     try {
-      await productService.updateProduct(productId, { isActive: !currentStatus });
+      await productService.updateProduct(productId, { isActive: !currentStatus } as any);
       toast.success(`Product ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
       fetchProducts();
     } catch (error) {
@@ -253,7 +253,7 @@ export default function ProductsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleToggleStatus(product._id, product.isActive)}
+                        onClick={() => handleToggleStatus(product._id, product.isActive ?? true)}
                       >
                         {product.isActive ? (
                           <ToggleRight className="w-4 h-4 text-green-600" />
@@ -343,7 +343,7 @@ export default function ProductsPage() {
           </DialogHeader>
           {editingProduct && (
             <EditProductForm
-              product={editingProduct}
+              product={editingProduct as any}
               onClose={() => {
                 setShowEditModal(false);
                 setEditingProduct(null);

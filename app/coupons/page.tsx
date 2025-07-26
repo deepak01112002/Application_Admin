@@ -40,15 +40,24 @@ export default function CouponsPage() {
     try {
       setLoading(true);
       const response = await couponService.getCoupons();
-      let filteredCoupons = response.coupons || [];
-      
-      if (searchTerm) {
+      let filteredCoupons = [];
+
+      // Ensure we have an array
+      if (Array.isArray(response)) {
+        filteredCoupons = response;
+      } else if (response && Array.isArray(response.coupons)) {
+        filteredCoupons = response.coupons;
+      } else if (response && Array.isArray(response.data)) {
+        filteredCoupons = response.data;
+      }
+
+      if (searchTerm && filteredCoupons.length > 0) {
         filteredCoupons = filteredCoupons.filter((coupon: Coupon) =>
-          coupon.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          coupon.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           coupon.description?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
-      
+
       setCoupons(filteredCoupons);
     } catch (error) {
       toast.error('Failed to load coupons');

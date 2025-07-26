@@ -20,6 +20,7 @@ import {
   TrendingUp,
   AlertCircle
 } from "lucide-react";
+import { supplierService } from "@/lib/services";
 
 interface Supplier {
   _id: string;
@@ -117,99 +118,20 @@ export default function SuppliersPage() {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        // Simulated API call - Replace with actual API
-        const sampleSuppliers: Supplier[] = [
-          {
-            _id: "1",
-            name: "Rajesh Electronics Pvt Ltd",
-            email: "rajesh@electronics.com",
-            phone: "+91 98765 43210",
-            address: "123 Electronics Market",
-            city: "Delhi",
-            state: "Delhi",
-            pincode: "110001",
-            gst: "07AABCU9603R1ZX",
-            contactPerson: "Rajesh Kumar",
-            status: "active",
-            totalOrders: 45,
-            totalAmount: 2850000,
-            lastOrderDate: "2025-01-20",
-            createdAt: "2024-06-15"
-          },
-          {
-            _id: "2",
-            name: "Mumbai Wholesale Traders",
-            email: "info@mumbaitraders.com",
-            phone: "+91 98765 43211",
-            address: "456 Wholesale Market",
-            city: "Mumbai",
-            state: "Maharashtra",
-            pincode: "400001",
-            gst: "27AABCU9603R1ZY",
-            contactPerson: "Amit Shah",
-            status: "active",
-            totalOrders: 32,
-            totalAmount: 1950000,
-            lastOrderDate: "2025-01-18",
-            createdAt: "2024-08-10"
-          },
-          {
-            _id: "3",
-            name: "Bangalore Tech Solutions",
-            email: "contact@bangaloretech.com",
-            phone: "+91 98765 43212",
-            address: "789 Tech Park",
-            city: "Bangalore",
-            state: "Karnataka",
-            pincode: "560001",
-            gst: "29AABCU9603R1ZZ",
-            contactPerson: "Priya Sharma",
-            status: "inactive",
-            totalOrders: 18,
-            totalAmount: 890000,
-            lastOrderDate: "2024-12-15",
-            createdAt: "2024-04-20"
-          },
-          {
-            _id: "4",
-            name: "Chennai Distributors",
-            email: "sales@chennaidistr.com",
-            phone: "+91 98765 43213",
-            address: "321 Distribution Center",
-            city: "Chennai",
-            state: "Tamil Nadu",
-            pincode: "600001",
-            gst: "33AABCU9603R1ZA",
-            contactPerson: "Ravi Krishnan",
-            status: "active",
-            totalOrders: 28,
-            totalAmount: 1650000,
-            lastOrderDate: "2025-01-22",
-            createdAt: "2024-07-05"
-          },
-          {
-            _id: "5",
-            name: "Kolkata Imports & Exports",
-            email: "import@kolkataie.com",
-            phone: "+91 98765 43214",
-            address: "654 Import House",
-            city: "Kolkata",
-            state: "West Bengal",
-            pincode: "700001",
-            gst: "19AABCU9603R1ZB",
-            contactPerson: "Subhash Ghosh",
-            status: "active",
-            totalOrders: 22,
-            totalAmount: 1320000,
-            lastOrderDate: "2025-01-19",
-            createdAt: "2024-09-12"
-          }
-        ];
+        // Fetch real suppliers from backend
+        const suppliersResponse = await supplierService.getAllSuppliers();
 
-        setSuppliers(sampleSuppliers);
-        setLoading(false);
+        if (suppliersResponse && Array.isArray(suppliersResponse)) {
+          setSuppliers(suppliersResponse);
+        } else {
+          // No suppliers found, show empty state
+          setSuppliers([]);
+        }
       } catch (error) {
-        console.error('Error fetching suppliers:', error);
+        console.error('Failed to fetch suppliers:', error);
+        // Show empty state on error
+        setSuppliers([]);
+      } finally {
         setLoading(false);
       }
     };
@@ -246,11 +168,13 @@ export default function SuppliersPage() {
 
   if (loading) {
     return (
+      <AdminLayout currentPage="suppliers">
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold">Suppliers Management</h1>
             <p className="text-muted-foreground">Loading suppliers data...</p>
-          </div>          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
               <Card key={i}>              <CardContent className="p-6">
                   <div className="animate-pulse">
@@ -262,64 +186,80 @@ export default function SuppliersPage() {
             ))}
           </div>
         </div>
-      );
-    }
+      </AdminLayout>
+    );
+  }
 
-    return (
-      <AdminLayout currentPage="suppliers">
-        <div className="space-y-6">          <div className="flex justify-between items-center">
-            <div>
+  return (
+    <AdminLayout currentPage="suppliers">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
             <h1 className="text-3xl font-bold">Suppliers Management</h1>
             <p className="text-muted-foreground">Manage your supplier relationships and orders.</p>
-      </div>
+          </div>
           <Button className="bg-blue-600 hover:bg-blue-700">
-      <Plus className="h-4 w-4 mr-2" />
-      Add New Supplier
-      </Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add New Supplier
+          </Button>
         </div>
 
-      {/* Stats Cards */}          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">            <Card>              <CardContent className="p-6">
-      <div className="flex items-center">
-      <Building className="h-8 w-8 text-blue-600" />
-      <div className="ml-4">
-      <p className="text-sm font-medium text-muted-foreground">Total Suppliers</p>
-      <p className="text-2xl font-bold">{totalSuppliers}</p>
-      </div>
-      </div>
-      </CardContent>
-      </Card>            <Card>              <CardContent className="p-6">
-      <div className="flex items-center">
-      <TrendingUp className="h-8 w-8 text-green-600" />
-      <div className="ml-4">
-      <p className="text-sm font-medium text-muted-foreground">Active Suppliers</p>
-      <p className="text-2xl font-bold">{activeSuppliers}</p>
-      </div>
-      </div>
-      </CardContent>
-      </Card>            <Card>              <CardContent className="p-6">
-      <div className="flex items-center">
-      <Package className="h-8 w-8 text-purple-600" />
-      <div className="ml-4">
-      <p className="text-sm font-medium text-muted-foreground">Total Orders</p>
-      <p className="text-2xl font-bold">{totalOrders}</p>
-      </div>
-      </div>
-      </CardContent>
-      </Card>            <Card>              <CardContent className="p-6">
-      <div className="flex items-center">
-      <TrendingUp className="h-8 w-8 text-orange-600" />
-      <div className="ml-4">
-      <p className="text-sm font-medium text-muted-foreground">Total Value</p>
-      <p className="text-2xl font-bold">{formatCurrency(totalAmount)}</p>
-      </div>
-      </div>
-      </CardContent>
-      </Card>
-      </div>
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <Building className="h-8 w-8 text-blue-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-muted-foreground">Total Suppliers</p>
+                  <p className="text-2xl font-bold">{totalSuppliers}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Filters */}            <Card>              <CardContent className="p-6">
-      <div className="flex flex-col sm:flex-row gap-4">
-      <div className="flex-1">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <TrendingUp className="h-8 w-8 text-green-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-muted-foreground">Active Suppliers</p>
+                  <p className="text-2xl font-bold">{activeSuppliers}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <Package className="h-8 w-8 text-purple-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-muted-foreground">Total Orders</p>
+                  <p className="text-2xl font-bold">{totalOrders}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <TrendingUp className="h-8 w-8 text-orange-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-muted-foreground">Total Value</p>
+                  <p className="text-2xl font-bold">{formatCurrency(totalAmount)}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
       <div className="relative">
       <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
       <Input
@@ -457,8 +397,6 @@ export default function SuppliersPage() {
       </CardContent>
       </Card>
       </div>
-      </div>
-      </div>
     </AdminLayout>
-    );
-  }
+  );
+}

@@ -188,7 +188,7 @@ export default function CustomersPage() {
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      {formatDate(customer.lastLogin)}
+                      {customer.lastLogin ? formatDate(customer.lastLogin) : 'Never'}
                     </div>
                   </TableCell>
                   <TableCell>

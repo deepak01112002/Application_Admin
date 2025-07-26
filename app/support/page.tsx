@@ -152,8 +152,9 @@ export default function SupportPage() {
     );
   }
 
-      <AdminLayout currentPage="support">
-        <div className="space-y-6">
+  return (
+    <AdminLayout currentPage="support">
+      <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Customer Support</h1>

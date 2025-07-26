@@ -167,10 +167,25 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
+    try {
+      // Try to call backend logout endpoint
+      await api.post('/auth/logout');
+    } catch (error) {
+      // Continue with logout even if backend call fails
+      console.warn('Backend logout failed, continuing with local logout:', error);
+    }
+
     // Clear token from localStorage
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
       localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      localStorage.clear(); // Clear all localStorage data
+    }
+
+    // Redirect to login page
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
     }
   },
 

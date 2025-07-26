@@ -167,7 +167,7 @@ export function StatsCards() {
       value: dashboardData?.productStats?.outOfStockProducts?.toString() || '0',
       change: "Products unavailable",
       icon: Package,
-      trend: dashboardData?.productStats?.outOfStockProducts > 0 ? "alert" : "neutral",
+      trend: (dashboardData?.productStats?.outOfStockProducts ?? 0) > 0 ? "alert" : "neutral",
     },
     {
       title: "Support Tickets",

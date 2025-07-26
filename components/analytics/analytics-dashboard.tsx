@@ -66,33 +66,33 @@ export function AnalyticsDashboard() {
       const totalCustomers = stats?.userCount || users.length;
       const conversionRate = totalOrders > 0 ? ((totalOrders / (totalCustomers || 1)) * 100) : 0;
 
-      // Calculate top products from real data
-      const topProducts = products.slice(0, 4).map((product: any, index: number) => ({
+      // Calculate top products from real data (no dummy data)
+      const topProducts = products.products ? products.products.slice(0, 4).map((product: any) => ({
         name: product.name,
-        sales: Math.floor(Math.random() * 200) + 50, // Simulated sales data
-        revenue: `₹${(product.price * (Math.floor(Math.random() * 200) + 50)).toLocaleString()}`
-      }));
+        sales: product.stock || 0, // Use actual stock as sales indicator
+        revenue: `₹${(product.price * (product.stock || 0)).toLocaleString()}`
+      })) : [];
 
-      // Generate realistic insights
+      // Calculate real customer insights from actual data
       const customerInsights = {
-        returningCustomers: Math.floor(Math.random() * 30) + 60, // 60-90%
-        averageOrderValue: totalRevenue > 0 ? Math.floor(totalRevenue / (totalOrders || 1)) : 1847,
-        customerLifetimeValue: Math.floor(Math.random() * 5000) + 5000
+        returningCustomers: totalCustomers > 0 ? Math.floor((totalOrders / totalCustomers) * 100) : 0,
+        averageOrderValue: totalRevenue > 0 && totalOrders > 0 ? Math.floor(totalRevenue / totalOrders) : 0,
+        customerLifetimeValue: totalRevenue > 0 && totalCustomers > 0 ? Math.floor(totalRevenue / totalCustomers) : 0
       };
 
-      // Traffic sources (simulated but realistic)
+      // Traffic sources - use real data or show as unavailable
       const trafficSources = [
-        { source: 'Direct', percentage: 45, color: 'bg-blue-500' },
-        { source: 'Search', percentage: 32, color: 'bg-green-500' },
-        { source: 'Social', percentage: 23, color: 'bg-purple-500' }
+        { source: 'Direct', percentage: 0, color: 'bg-blue-500' },
+        { source: 'Search', percentage: 0, color: 'bg-green-500' },
+        { source: 'Social', percentage: 0, color: 'bg-purple-500' }
       ];
 
-      // Recent activity from real data
+      // Recent activity from real data (no dummy data)
       const recentActivity = [
-        { type: 'order', message: `New order #${Math.floor(Math.random() * 1000) + 1000} received`, color: 'bg-green-500' },
-        { type: 'user', message: `Customer ${users[0]?.name || 'John D.'} registered`, color: 'bg-blue-500' },
-        { type: 'stock', message: `Product "${products[0]?.name || 'Product'}" low stock`, color: 'bg-orange-500' },
-        { type: 'payment', message: `Payment of ₹${Math.floor(Math.random() * 5000) + 1000} received`, color: 'bg-purple-500' }
+        { type: 'order', message: `Total orders: ${totalOrders}`, color: 'bg-green-500' },
+        { type: 'user', message: `Total customers: ${totalCustomers}`, color: 'bg-blue-500' },
+        { type: 'stock', message: `Products available: ${products.products?.length || 0}`, color: 'bg-orange-500' },
+        { type: 'payment', message: `Total revenue: ₹${totalRevenue.toLocaleString()}`, color: 'bg-purple-500' }
       ];
 
       setAnalytics({
@@ -100,10 +100,10 @@ export function AnalyticsDashboard() {
         totalOrders,
         totalCustomers,
         conversionRate: Math.round(conversionRate * 10) / 10,
-        revenueGrowth: Math.floor(Math.random() * 20) + 5, // 5-25% growth
-        ordersGrowth: Math.floor(Math.random() * 15) + 3, // 3-18% growth
-        customersGrowth: Math.floor(Math.random() * 25) + 10, // 10-35% growth
-        conversionGrowth: Math.floor(Math.random() * 10) / 10, // 0.1-1.0% growth
+        revenueGrowth: 0, // Real growth calculation would need historical data
+        ordersGrowth: 0, // Real growth calculation would need historical data
+        customersGrowth: 0, // Real growth calculation would need historical data
+        conversionGrowth: 0, // Real growth calculation would need historical data
         topProducts,
         customerInsights,
         trafficSources,

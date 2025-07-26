@@ -21,6 +21,7 @@ import {
   Plus
 } from "lucide-react";
 import { AdminLayout } from "@/components/layout/admin-layout";
+import { shippingService } from "@/lib/services";
 
 interface ShippingOrder {
   _id: string;
@@ -49,138 +50,34 @@ export default function ShippingPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'picked_up' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'failed'>('all');
 
-  // Real shipping data from actual business operations
+  // Fetch real shipping data from backend
   useEffect(() => {
     const fetchShipments = async () => {
       try {
-        const realShipments: ShippingOrder[] = [
-          {
-            _id: "1",
-            orderId: "ORD-2025-0156",
-            trackingNumber: "DTDC123456789",
-            customerName: "Rajesh Kumar",
-            customerPhone: "+91 98765 43210",
-            deliveryAddress: "123 MG Road, Connaught Place",
-            city: "New Delhi",
-            state: "Delhi",
-            pincode: "110001",
-            courierPartner: "DTDC",
-            status: "out_for_delivery",
-            estimatedDelivery: "2025-01-25",
-            shippingCost: 150,
-            weight: 0.5,
-            dimensions: "15x10x5 cm",
-            createdAt: "2025-01-22",
-            updatedAt: "2025-01-24"
-          },
-          {
-            _id: "2",
-            orderId: "ORD-2025-0143",
-            trackingNumber: "BLU987654321",
-            customerName: "Priya Sharma",
-            customerPhone: "+91 98765 43211",
-            deliveryAddress: "456 Brigade Road, Koramangala",
-            city: "Bangalore",
-            state: "Karnataka",
-            pincode: "560034",
-            courierPartner: "Blue Dart",
-            status: "delivered",
-            estimatedDelivery: "2025-01-23",
-            actualDelivery: "2025-01-23",
-            shippingCost: 200,
-            weight: 0.6,
-            dimensions: "16x11x6 cm",
-            createdAt: "2025-01-20",
-            updatedAt: "2025-01-23"
-          },
-          {
-            _id: "3",
-            orderId: "ORD-2025-0134",
-            trackingNumber: "FED456789123",
-            customerName: "Amit Singh",
-            customerPhone: "+91 98765 43212",
-            deliveryAddress: "789 Park Street, Salt Lake",
-            city: "Kolkata",
-            state: "West Bengal",
-            pincode: "700064",
-            courierPartner: "FedEx",
-            status: "in_transit",
-            estimatedDelivery: "2025-01-26",
-            shippingCost: 180,
-            weight: 0.4,
-            dimensions: "14x9x4 cm",
-            createdAt: "2025-01-21",
-            updatedAt: "2025-01-24"
-          },
-          {
-            _id: "4",
-            orderId: "ORD-2025-0128",
-            trackingNumber: "DHL789123456",
-            customerName: "Sunita Patel",
-            customerPhone: "+91 98765 43213",
-            deliveryAddress: "321 FC Road, Shivaji Nagar",
-            city: "Pune",
-            state: "Maharashtra",
-            pincode: "411005",
-            courierPartner: "DHL",
-            status: "failed",
-            estimatedDelivery: "2025-01-24",
-            shippingCost: 220,
-            weight: 0.7,
-            dimensions: "17x12x7 cm",
-            createdAt: "2025-01-19",
-            updatedAt: "2025-01-24"
-          },
-          {
-            _id: "5",
-            orderId: "ORD-2025-0167",
-            trackingNumber: "EKL654321987",
-            customerName: "Ravi Krishnan",
-            customerPhone: "+91 98765 43214",
-            deliveryAddress: "654 Anna Salai, T Nagar",
-            city: "Chennai",
-            state: "Tamil Nadu",
-            pincode: "600017",
-            courierPartner: "Ecom Express",
-            status: "picked_up",
-            estimatedDelivery: "2025-01-27",
-            shippingCost: 160,
-            weight: 0.5,
-            dimensions: "15x10x5 cm",
-            createdAt: "2025-01-23",
-            updatedAt: "2025-01-24"
-          },
-          {
-            _id: "6",
-            orderId: "ORD-2025-0145",
-            trackingNumber: "XPB321654987",
-            customerName: "Neha Gupta",
-            customerPhone: "+91 98765 43215",
-            deliveryAddress: "987 Sector 18, Noida",
-            city: "Noida",
-            state: "Uttar Pradesh",
-            pincode: "201301",
-            courierPartner: "Xpressbees",
-            status: "pending",
-            estimatedDelivery: "2025-01-28",
-            shippingCost: 140,
-            weight: 0.3,
-            dimensions: "13x8x3 cm",
-            createdAt: "2025-01-24",
-            updatedAt: "2025-01-24"
-          }
-        ];
+        // Fetch real shipments from backend API
+        const response = await shippingService.getShipments();
 
-        setShipments(realShipments);
-        setLoading(false);
+        if (response && Array.isArray(response)) {
+          setShipments(response);
+        } else if (response && Array.isArray(response.shipments)) {
+          setShipments(response.shipments);
+        } else {
+          // No shipments found, show empty state
+          setShipments([]);
+        }
       } catch (error) {
-        console.error('Error fetching shipments:', error);
+        console.error('Failed to fetch shipments:', error);
+        // Show empty state on error
+        setShipments([]);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchShipments();
   }, []);
+
+
 
   const filteredShipments = shipments.filter(shipment => {
     const matchesSearch = shipment.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -242,35 +139,36 @@ export default function ShippingPage() {
           <div>
             <h1 className="text-3xl font-bold">Shipping Management</h1>
             <p className="text-muted-foreground">Loading shipping data...</p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <Card key={i}>
               <CardContent className="p-6">
                 <div className="animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                   <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-                </div>
+          </div>
               </CardContent>
             </Card>
           ))}
         </div>
-      </div>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-      <AdminLayout currentPage="shipping">
-        <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
+    <AdminLayout currentPage="shipping">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
             <h1 className="text-3xl font-bold">Shipping Management</h1>
             <p className="text-muted-foreground">Track and manage order deliveries and shipments.</p>
-        </div>
+          </div>
           <Button className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Shipment
-        </Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Shipment
+          </Button>
         </div>
 
       {/* Stats Cards */}
@@ -280,9 +178,9 @@ export default function ShippingPage() {
             <div className="flex items-center">
               <Truck className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Total Shipments</p>
-                <p className="text-2xl font-bold">{totalShipments}</p>
-              </div>
+          <p className="text-sm font-medium text-muted-foreground">Total Shipments</p>
+          <p className="text-2xl font-bold">{totalShipments}</p>
+      </div>
             </div>
           </CardContent>
         </Card>
@@ -292,9 +190,9 @@ export default function ShippingPage() {
             <div className="flex items-center">
               <Navigation className="h-8 w-8 text-yellow-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">In Transit</p>
-                <p className="text-2xl font-bold">{inTransitShipments}</p>
-              </div>
+          <p className="text-sm font-medium text-muted-foreground">In Transit</p>
+          <p className="text-2xl font-bold">{inTransitShipments}</p>
+      </div>
             </div>
           </CardContent>
         </Card>
@@ -304,9 +202,9 @@ export default function ShippingPage() {
             <div className="flex items-center">
               <CheckCircle className="h-8 w-8 text-green-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Delivered</p>
-                <p className="text-2xl font-bold">{deliveredShipments}</p>
-              </div>
+          <p className="text-sm font-medium text-muted-foreground">Delivered</p>
+          <p className="text-2xl font-bold">{deliveredShipments}</p>
+      </div>
             </div>
           </CardContent>
         </Card>
@@ -316,9 +214,9 @@ export default function ShippingPage() {
             <div className="flex items-center">
               <Package className="h-8 w-8 text-purple-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Shipping Cost</p>
-                <p className="text-2xl font-bold">{formatCurrency(totalShippingCost)}</p>
-              </div>
+          <p className="text-sm font-medium text-muted-foreground">Shipping Cost</p>
+          <p className="text-2xl font-bold">{formatCurrency(totalShippingCost)}</p>
+      </div>
             </div>
           </CardContent>
         </Card>
@@ -337,8 +235,8 @@ export default function ShippingPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
-              </div>
-            </div>
+        </div>
+      </div>
             <div className="flex gap-2">
               <Button
                 variant={filterStatus === 'all' ? 'default' : 'outline'}
@@ -369,7 +267,7 @@ export default function ShippingPage() {
                 Delivered ({deliveredShipments})
               </Button>
         </div>
-          </div>
+      </div>
         </CardContent>
       </Card>
 
@@ -396,22 +294,22 @@ export default function ShippingPage() {
                 {filteredShipments.map((shipment) => (
                   <tr key={shipment._id} className="border-b hover:bg-gray-50">
                     <td className="p-4">
-                      <div>
+        <div>
                         <div className="font-medium text-gray-900">{shipment.orderId}</div>
                         <div className="text-sm text-gray-500">Tracking: {shipment.trackingNumber}</div>
                         <div className="text-sm text-gray-500">
                           {shipment.weight}kg • {shipment.dimensions}
-                        </div>
-                      </div>
+        </div>
+      </div>
                     </td>
                     <td className="p-4">
-                      <div>
+        <div>
                         <div className="font-medium">{shipment.customerName}</div>
                         <div className="text-sm text-gray-500 flex items-center">
                           <Phone className="h-3 w-3 mr-1" />
                           {shipment.customerPhone}
-                        </div>
-                      </div>
+        </div>
+      </div>
                     </td>
                     <td className="p-4">
                       <div className="flex items-start">
@@ -419,14 +317,14 @@ export default function ShippingPage() {
                         <div className="text-sm">
                           <div>{shipment.deliveryAddress}</div>
                           <div className="text-gray-500">{shipment.city}, {shipment.state} - {shipment.pincode}</div>
-                        </div>
-                      </div>
+        </div>
+      </div>
                     </td>
                     <td className="p-4">
-                      <div>
+        <div>
                         <div className="font-medium">{shipment.courierPartner}</div>
                         <div className="text-sm text-gray-500">{formatCurrency(shipment.shippingCost)}</div>
-                      </div>
+        </div>
                     </td>
                     <td className="p-4">
                       <Badge className={`${getStatusColor(shipment.status)} flex items-center gap-1 w-fit`}>
@@ -439,13 +337,13 @@ export default function ShippingPage() {
                         <div className="flex items-center">
                           <Calendar className="h-3 w-3 mr-1 text-gray-400" />
                           Est: {formatDate(shipment.estimatedDelivery)}
-                        </div>
+        </div>
                         {shipment.actualDelivery && (
                           <div className="text-green-600 font-medium">
                             Delivered: {formatDate(shipment.actualDelivery)}
-                          </div>
+        </div>
                         )}
-                      </div>
+        </div>
                     </td>
                     <td className="p-4">
                       <div className="flex space-x-2">
@@ -466,12 +364,12 @@ export default function ShippingPage() {
               <div className="text-center py-8">
                 <Truck className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-2 text-sm font-semibold text-gray-900">No shipments found</h3>
-                <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500">
                   {searchTerm ? 'Try adjusting your search criteria.' : 'No shipments to track at the moment.'}
                 </p>
-              </div>
+        </div>
             )}
-          </div>
+        </div>
         </CardContent>
       </Card>
       </div>

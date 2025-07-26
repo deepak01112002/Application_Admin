@@ -121,7 +121,7 @@ export default function ReturnsPage() {
   };
 
   if (loading) {
-  return (
+    return (
       <AdminLayout currentPage="returns">
         <div className="space-y-6">
           <div>
@@ -141,12 +141,13 @@ export default function ReturnsPage() {
             ))}
           </div>
         </div>
-    </AdminLayout>
+      </AdminLayout>
     );
   }
 
-      <AdminLayout currentPage="returns">
-        <div className="space-y-6">
+  return (
+    <AdminLayout currentPage="returns">
+      <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Returns Management</h1>
@@ -366,8 +367,8 @@ export default function ReturnsPage() {
             )}
           </div>
         </CardContent>
-      </Card>
-        </div>
+        </Card>
+      </div>
     </AdminLayout>
   );
 }

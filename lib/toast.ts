@@ -20,7 +20,7 @@ class ToastManager {
 
   show(options: ToastOptions) {
     const toast = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: `toast-${Date.now()}-${this.toasts.length}`,
       title: options.title || '',
       description: options.description || '',
       type: options.type || 'info',

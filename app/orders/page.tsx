@@ -247,7 +247,7 @@ export default function OrdersPage() {
                   return null;
                 }
 
-                const orderId = order._id || order.id;
+                const orderId = order._id || (order as any).id;
                 if (!orderId) {
                   console.warn(`Order missing ID at index ${index}:`, order);
                   return null;
@@ -261,15 +261,15 @@ export default function OrdersPage() {
                 // Safe customer name extraction
                 let customerName = 'Unknown Customer';
                 if (order.user && typeof order.user === 'object') {
-                  const firstName = order.user.firstName || order.user.first_name || '';
-                  const lastName = order.user.lastName || order.user.last_name || '';
+                  const firstName = order.user.firstName || (order.user as any).first_name || '';
+                  const lastName = order.user.lastName || (order.user as any).last_name || '';
                   const fullName = `${firstName} ${lastName}`.trim();
-                  customerName = fullName || order.user.name || 'Unknown Customer';
+                  customerName = fullName || (order.user as any).name || 'Unknown Customer';
                 }
 
                 const customerEmail = order.user?.email || 'No email';
-                const orderDate = order.createdAt || order.orderDate || order.created_at || new Date().toISOString();
-                const orderNumber = order.orderNumber || order.order_number || `ORD-${orderId.toString().slice(-6)}`;
+                const orderDate = order.createdAt || (order as any).orderDate || (order as any).created_at || new Date().toISOString();
+                const orderNumber = (order as any).orderNumber || (order as any).order_number || `ORD-${orderId.toString().slice(-6)}`;
 
                 return (
                   <TableRow key={orderId}>

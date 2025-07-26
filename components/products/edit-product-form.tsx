@@ -20,7 +20,7 @@ export function EditProductForm({ product, onClose, onProductUpdated }: EditProd
   const [formData, setFormData] = useState({
     name: product.name,
     description: product.description,
-    category: product.category.id || product.category._id || '',
+    category: product.category.id || (product.category as any)._id || '',
     price: product.price.toString(),
     originalPrice: product.original_price.toString(),
     stock: product.stock.toString(),

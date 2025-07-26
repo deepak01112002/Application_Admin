@@ -1,193 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Package,
-  Users,
-  ShoppingCart,
-  BarChart3,
-  PieChart,
-  Activity,
-  Target,
-  Calendar,
-  ArrowUpRight,
-  ArrowDownRight,
-  Eye,
-  RefreshCw
-} from "lucide-react";
-
-interface AnalyticsData {
-  totalRevenue: number;
-  revenueGrowth: number;
-  totalOrders: number;
-  ordersGrowth: number;
-  totalCustomers: number;
-  customersGrowth: number;
-  conversionRate: number;
-  conversionGrowth: number;
-  avgOrderValue: number;
-  avgOrderGrowth: number;
-  topProducts: {
-    name: string;
-    sales: number;
-    revenue: number;
-    growth: number;
-  }[];
-  salesByCategory: {
-    category: string;
-    sales: number;
-    percentage: number;
-  }[];
-  recentActivity: {
-    type: string;
-    description: string;
-    time: string;
-    value?: number;
-  }[];
-}
+import { AdminLayout } from "@/components/layout/admin-layout";
+import { AnalyticsDashboard } from "@/components/analytics/analytics-dashboard";
 
 export default function AnalyticsPage() {
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
-
-  // Real analytics data from business operations
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const realAnalytics: AnalyticsData = {
-          totalRevenue: 2850000,
-          revenueGrowth: 12.5,
-          totalOrders: 156,
-          ordersGrowth: 8.3,
-          totalCustomers: 89,
-          customersGrowth: 15.7,
-          conversionRate: 3.2,
-          conversionGrowth: 0.8,
-          avgOrderValue: 18269,
-          avgOrderGrowth: 4.2,
-          topProducts: [
-            { name: "iPhone 15 Pro Max 256GB", sales: 25, revenue: 3997500, growth: 18.5 },
-            { name: "Samsung Galaxy S24 Ultra 512GB", sales: 18, revenue: 2339982, growth: 12.3 },
-            { name: "OnePlus 12 16GB/512GB", sales: 22, revenue: 1539978, growth: -2.1 },
-            { name: "Google Pixel 8 Pro 256GB", sales: 15, revenue: 1274985, growth: 25.8 },
-            { name: "Xiaomi 14 Ultra 16GB/512GB", sales: 12, revenue: 1199988, growth: 8.9 }
-          ],
-          salesByCategory: [
-            { category: "Premium Smartphones", sales: 92, percentage: 58.9 },
-            { category: "Mid-range Smartphones", sales: 38, percentage: 24.4 },
-            { category: "Budget Smartphones", sales: 16, percentage: 10.3 },
-            { category: "Accessories", sales: 10, percentage: 6.4 }
-          ],
-          recentActivity: [
-            { type: "order", description: "New order from Rajesh Kumar", time: "2 minutes ago", value: 159900 },
-            { type: "customer", description: "New customer registration", time: "5 minutes ago" },
-            { type: "return", description: "Return request processed", time: "12 minutes ago", value: -129999 },
-            { type: "order", description: "Order delivered to Priya Sharma", time: "18 minutes ago", value: 84999 },
-            { type: "review", description: "5-star review received", time: "25 minutes ago" },
-            { type: "order", description: "Bulk order from corporate client", time: "1 hour ago", value: 450000 },
-            { type: "inventory", description: "Low stock alert: iPhone 15 Pro", time: "2 hours ago" },
-            { type: "payment", description: "Payment received for order #156", time: "3 hours ago", value: 69999 }
-          ]
-        };
-
-        setAnalytics(realAnalytics);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchAnalytics();
-  }, [selectedPeriod]);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(Math.abs(amount));
-  };
-
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
-    } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toString();
-  };
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'order': return <ShoppingCart className="h-4 w-4" />;
-      case 'customer': return <Users className="h-4 w-4" />;
-      case 'return': return <TrendingDown className="h-4 w-4" />;
-      case 'review': return <Eye className="h-4 w-4" />;
-      case 'payment': return <DollarSign className="h-4 w-4" />;
-      case 'inventory': return <Package className="h-4 w-4" />;
-      default: return <Activity className="h-4 w-4" />;
-    }
-  };
-
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case 'order': return 'text-green-600';
-      case 'customer': return 'text-blue-600';
-      case 'return': return 'text-red-600';
-      case 'review': return 'text-yellow-600';
-      case 'payment': return 'text-green-600';
-      case 'inventory': return 'text-orange-600';
-      default: return 'text-gray-600';
-    }
-  };
-
-  if (loading) {
-    return (
-      <AdminLayout currentPage="analytics">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-            <p className="text-muted-foreground">Loading analytics data...</p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!analytics) {
-    return (
-      <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-            <p className="text-muted-foreground">Failed to load analytics data.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
+    <AdminLayout currentPage="analytics">
+      <AnalyticsDashboard />
+    </AdminLayout>
+  );
+}
+        <div className="flex justify-between items-center">
+          <div>
             <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
             <p className="text-muted-foreground">Real-time business insights and performance metrics.</p>
         </div>
@@ -444,6 +268,7 @@ export default function AnalyticsPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
