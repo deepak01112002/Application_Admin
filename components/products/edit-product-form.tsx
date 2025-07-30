@@ -26,6 +26,17 @@ export function EditProductForm({ product, onClose, onProductUpdated }: EditProd
     stock: product.stock.toString(),
     isActive: product.is_active,
     isFeatured: product.is_featured || false,
+    // Specifications
+    material: product.specifications?.material || '',
+    height: product.specifications?.height || '',
+    width: product.specifications?.width || '',
+    weight: product.specifications?.weight || '',
+    finish: product.specifications?.finish || '',
+    origin: product.specifications?.origin || '',
+    color: product.specifications?.color || '',
+    style: product.specifications?.style || '',
+    occasion: product.specifications?.occasion || '',
+    careInstructions: product.specifications?.careInstructions || '',
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -64,6 +75,18 @@ export function EditProductForm({ product, onClose, onProductUpdated }: EditProd
       formDataToSend.append('stock', formData.stock);
       formDataToSend.append('isActive', formData.isActive.toString());
       formDataToSend.append('isFeatured', formData.isFeatured.toString());
+
+      // Specifications
+      formDataToSend.append('material', formData.material);
+      formDataToSend.append('height', formData.height);
+      formDataToSend.append('width', formData.width);
+      formDataToSend.append('weight', formData.weight);
+      formDataToSend.append('finish', formData.finish);
+      formDataToSend.append('origin', formData.origin);
+      formDataToSend.append('color', formData.color);
+      formDataToSend.append('style', formData.style);
+      formDataToSend.append('occasion', formData.occasion);
+      formDataToSend.append('careInstructions', formData.careInstructions);
 
       // Add new images if any
       images.forEach((image) => {
@@ -245,6 +268,114 @@ export function EditProductForm({ product, onClose, onProductUpdated }: EditProd
                 />
                 <Label htmlFor="isFeatured">Featured</Label>
               </div>
+            </div>
+          </div>
+
+          {/* Product Specifications */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Product Specifications</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="material">Material</Label>
+                <Input
+                  id="material"
+                  value={formData.material}
+                  onChange={(e) => handleInputChange("material", e.target.value)}
+                  placeholder="e.g., Premium Brass/Marble"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="height">Height</Label>
+                <Input
+                  id="height"
+                  value={formData.height}
+                  onChange={(e) => handleInputChange("height", e.target.value)}
+                  placeholder="e.g., 12 inches"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="width">Width</Label>
+                <Input
+                  id="width"
+                  value={formData.width}
+                  onChange={(e) => handleInputChange("width", e.target.value)}
+                  placeholder="e.g., 8 inches"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="weight">Weight</Label>
+                <Input
+                  id="weight"
+                  value={formData.weight}
+                  onChange={(e) => handleInputChange("weight", e.target.value)}
+                  placeholder="e.g., 2.5 kg"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="finish">Finish</Label>
+                <Input
+                  id="finish"
+                  value={formData.finish}
+                  onChange={(e) => handleInputChange("finish", e.target.value)}
+                  placeholder="e.g., Antique Gold"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="origin">Origin</Label>
+                <Input
+                  id="origin"
+                  value={formData.origin}
+                  onChange={(e) => handleInputChange("origin", e.target.value)}
+                  placeholder="e.g., Handcrafted in India"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="color">Color</Label>
+                <Input
+                  id="color"
+                  value={formData.color}
+                  onChange={(e) => handleInputChange("color", e.target.value)}
+                  placeholder="e.g., Golden, Brown"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="style">Style</Label>
+                <Input
+                  id="style"
+                  value={formData.style}
+                  onChange={(e) => handleInputChange("style", e.target.value)}
+                  placeholder="e.g., Traditional, Modern"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="occasion">Occasion</Label>
+                <Input
+                  id="occasion"
+                  value={formData.occasion}
+                  onChange={(e) => handleInputChange("occasion", e.target.value)}
+                  placeholder="e.g., Festival, Daily Worship"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="careInstructions">Care Instructions</Label>
+              <Textarea
+                id="careInstructions"
+                value={formData.careInstructions}
+                onChange={(e) => handleInputChange("careInstructions", e.target.value)}
+                placeholder="Instructions for maintaining the product..."
+                rows={3}
+              />
             </div>
           </div>
 

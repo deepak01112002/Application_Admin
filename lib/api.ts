@@ -57,6 +57,14 @@ class ApiClient {
     };
 
     try {
+      // Debug: Log the request details
+      console.log('🚀 Making API request:', {
+        url,
+        method: config.method || 'GET',
+        hasAuth: !!headers.Authorization,
+        contentType: headers['Content-Type']
+      });
+
       // Add timeout to prevent hanging requests
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -68,12 +76,22 @@ class ApiClient {
 
       clearTimeout(timeoutId);
 
+      // Debug: Log the response
+      console.log('📥 API response:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('❌ API error response:', errorData);
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const responseData = await response.json();
+      console.log('✅ API response data:', responseData);
+      return responseData;
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.error('API request timeout:', url);
@@ -89,6 +107,21 @@ class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: any): Promise<T> {
+    // Debug logging for POST requests
+    console.log('🌐 API POST Request:', {
+      endpoint,
+      url: `${this.baseURL}${endpoint}`,
+      isFormData: data instanceof FormData,
+      hasData: !!data
+    });
+
+    if (data instanceof FormData) {
+      console.log('📤 FormData entries:');
+      for (let [key, value] of data.entries()) {
+        console.log(`  ${key}: ${value}`);
+      }
+    }
+
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data instanceof FormData ? data : (data ? JSON.stringify(data) : undefined),

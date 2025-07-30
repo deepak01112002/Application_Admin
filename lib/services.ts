@@ -47,6 +47,18 @@ export interface Product {
   is_featured: boolean;
   rating: number;
   review_count: number;
+  specifications?: {
+    material?: string;
+    height?: string;
+    width?: string;
+    weight?: string;
+    finish?: string;
+    origin?: string;
+    color?: string;
+    style?: string;
+    occasion?: string;
+    careInstructions?: string;
+  };
   created_at: string;
   updated_at: string;
 }
@@ -242,17 +254,23 @@ export const productService = {
 
   async getProduct(id: string): Promise<Product> {
     const response = await api.get(`/products/${id}`);
-    return extractData(response);
+    const data = extractData(response);
+    // Handle nested product data structure
+    return data.product || data;
   },
 
   async createProduct(data: FormData): Promise<Product> {
     const response = await api.post('/products', data);
-    return extractData(response);
+    const responseData = extractData(response);
+    // Handle nested product data structure
+    return responseData.product || responseData;
   },
 
   async updateProduct(id: string, data: FormData): Promise<Product> {
     const response = await api.put(`/products/${id}`, data);
-    return extractData(response);
+    const responseData = extractData(response);
+    // Handle nested product data structure
+    return responseData.product || responseData;
   },
 
   async deleteProduct(id: string): Promise<void> {
