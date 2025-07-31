@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Shield, Lock, Mail } from "lucide-react";
 import { useState } from "react";
+import { authService } from "@/lib/services";
+import { setAuthToken } from "@/lib/api";
 
 interface LoginFormProps {
-  onLogin: (credentials: { email: string; password: string }) => void;
+  onLogin: (user: any) => void;
 }
 
 export function LoginForm({ onLogin }: LoginFormProps) {
@@ -20,16 +22,50 @@ export function LoginForm({ onLogin }: LoginFormProps) {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent multiple submissions
+    if (isLoading) return;
+
     setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      onLogin({ email: formData.email, password: formData.password });
+    setError('');
+
+    try {
+      console.log('🔐 Starting login process...');
+      const startTime = Date.now();
+
+      const response = await authService.login(formData.email, formData.password);
+
+      const endTime = Date.now();
+      console.log(`✅ Login successful in ${endTime - startTime}ms`);
+
+      if (response.user.role !== 'admin') {
+        setError('Access denied. Admin privileges required.');
+        return;
+      }
+
+      setAuthToken(response.token);
+      onLogin(response.user);
+    } catch (err: any) {
+      console.error('❌ Login error:', err);
+      // Handle different error formats
+      let errorMessage = 'Login failed. Please try again.';
+
+      if (err.message) {
+        errorMessage = err.message;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.data?.errors?.length > 0) {
+        errorMessage = err.response.data.errors[0].message || err.response.data.errors[0];
+      }
+
+      setError(errorMessage);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -55,6 +91,11 @@ export function LoginForm({ onLogin }: LoginFormProps) {
             <CardTitle className="text-2xl font-semibold text-center">Welcome Back</CardTitle>
           </CardHeader>
           <CardContent>
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
@@ -129,7 +170,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Demo credentials: admin@example.com / password
+                Demo credentials: admin@test.com / admin123
               </p>
             </div>
           </CardContent>

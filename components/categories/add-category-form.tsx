@@ -6,49 +6,114 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { X } from "lucide-react";
-import { useState } from "react";
+import { Upload, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { categoryService } from "@/lib/services";
+
+interface Category {
+  _id: string;
+  name: string;
+  description?: string;
+  parent?: {
+    _id: string;
+    name: string;
+  } | null;
+}
 
 interface AddCategoryFormProps {
   onClose: () => void;
+  onCategoryAdded?: () => void;
 }
 
-export function AddCategoryForm({ onClose }: AddCategoryFormProps) {
+export function AddCategoryForm({ onClose, onCategoryAdded }: AddCategoryFormProps) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     parent: "",
-    slug: "",
-    isActive: true,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
-    onClose();
+  const [image, setImage] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [parentCategories, setParentCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    fetchParentCategories();
+  }, []);
+
+  const fetchParentCategories = async () => {
+    try {
+      const categories = await categoryService.getCategories();
+      // Filter to show only main categories (no parent) as potential parents
+      const mainCategories = categories.filter((cat: Category) => !cat.parent);
+      setParentCategories(mainCategories);
+    } catch (err) {
+      console.error('Failed to fetch parent categories:', err);
+    }
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('description', formData.description);
+
+      if (formData.parent) {
+        formDataToSend.append('parent', formData.parent);
+      }
+
+      if (image) {
+        formDataToSend.append('image', image);
+      }
+
+      await categoryService.createCategory(formDataToSend);
+
+      if (onCategoryAdded) {
+        onCategoryAdded();
+      }
+      onClose();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to create category');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
+  const removeImage = () => {
+    setImage(null);
+  };
+
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>Add New Category</CardTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+        <CardTitle>Add New Category</CardTitle>
       </CardHeader>
       <CardContent>
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Information */}
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Category Name</Label>
@@ -57,16 +122,7 @@ export function AddCategoryForm({ onClose }: AddCategoryFormProps) {
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="slug">Slug</Label>
-              <Input
-                id="slug"
-                value={formData.slug}
-                onChange={(e) => handleInputChange("slug", e.target.value)}
-                placeholder="category-slug"
+                placeholder="Enter category name"
               />
             </div>
 
@@ -77,40 +133,87 @@ export function AddCategoryForm({ onClose }: AddCategoryFormProps) {
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
                 rows={3}
+                placeholder="Enter category description"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="parent">Parent Category</Label>
-              <Select value={formData.parent} onValueChange={(value) => handleInputChange("parent", value)}>
+              <Label htmlFor="parent">Parent Category (Optional)</Label>
+              <Select value={formData.parent || "none"} onValueChange={(value) => handleInputChange("parent", value === "none" ? "" : value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select parent category (optional)" />
+                  <SelectValue placeholder="Select parent category (leave empty for main category)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="electronics">Electronics</SelectItem>
-                  <SelectItem value="clothing">Clothing</SelectItem>
-                  <SelectItem value="home">Home & Garden</SelectItem>
-                  <SelectItem value="sports">Sports</SelectItem>
+                  <SelectItem value="none">None (Main Category)</SelectItem>
+                  {parentCategories.map((category) => (
+                    <SelectItem key={category._id} value={category._id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="isActive"
-                checked={formData.isActive}
-                onCheckedChange={(checked) => handleInputChange("isActive", checked)}
-              />
-              <Label htmlFor="isActive">Active</Label>
+              <p className="text-sm text-muted-foreground">
+                Select a parent category to create a subcategory, or leave empty to create a main category.
+              </p>
             </div>
           </div>
 
-          <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          {/* Category Image */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Category Image</h3>
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="mt-2 text-sm text-gray-600">
+                  Click to upload category image
+                </p>
+                <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-2"
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                >
+                  Choose Image
+                </Button>
+              </div>
+
+              {/* Display selected image */}
+              {image && (
+                <div className="relative inline-block">
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Category preview"
+                    className="w-32 h-32 object-cover rounded border"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                    onClick={removeImage}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-4 pt-6 border-t">
+            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
               Cancel
             </Button>
-            <Button type="submit">
-              Add Category
+            <Button type="submit" disabled={loading}>
+              {loading ? "Adding Category..." : "Add Category"}
             </Button>
           </div>
         </form>

@@ -1,0 +1,509 @@
+{
+  "timestamp": "2025-07-26T15:29:04.276Z",
+  "summary": {
+    "totalFiles": 93,
+    "filesWithIssues": 3,
+    "filesWithoutApiServices": 67,
+    "totalIssues": 5
+  },
+  "results": {
+    "app/analytics/page.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "app/categories/page.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "app/coupons/page.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "app/customers/page.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "app/inventory/page.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "app/invoices/page.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "app/layout.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "app/orders/page.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "app/page.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "app/products/page.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "app/reports/page.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "app/returns/page.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "app/settings/page.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "app/shipping/page.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "app/suppliers/page.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "app/support/page.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/analytics/analytics-dashboard.tsx": {
+      "issues": [
+        {
+          "type": "dummy_data",
+          "pattern": "/dummy|mock|fake|test.*data/gi",
+          "match": "dummy",
+          "line": 69
+        },
+        {
+          "type": "dummy_data",
+          "pattern": "/dummy|mock|fake|test.*data/gi",
+          "match": "dummy",
+          "line": 69
+        }
+      ],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/auth/login-form.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/categories/add-category-form.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/categories/category-table.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/categories/edit-category-form.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/coupons/coupon-table.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/customers/customer-table.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/dashboard/recent-orders.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/dashboard/sales-chart.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/dashboard/stats-cards.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/inventory/inventory-table.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/layout/admin-layout.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/orders/order-table.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/products/add-product-form.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/products/edit-product-form.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/products/product-table.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/settings/business-settings.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/settings/general-settings.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/settings/other-settings.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/settings/payment-settings.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/settings/settings-panel.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/accordion.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/alert-dialog.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/alert.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/aspect-ratio.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/avatar.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/badge.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/breadcrumb.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/button.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/calendar.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/card.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/carousel.tsx": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "components/ui/chart.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/checkbox.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/collapsible.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/command.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/context-menu.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/dialog.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/drawer.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/dropdown-menu.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/form.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/hover-card.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/image-with-fallback.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/input-otp.tsx": {
+      "issues": [
+        {
+          "type": "dummy_data",
+          "pattern": "/dummy|mock|fake|test.*data/gi",
+          "match": "Fake",
+          "line": 38
+        },
+        {
+          "type": "dummy_data",
+          "pattern": "/dummy|mock|fake|test.*data/gi",
+          "match": "Fake",
+          "line": 38
+        }
+      ],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/input.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/label.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/menubar.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/navigation-menu.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/pagination.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/popover.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/progress.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/radio-group.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/resizable.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/scroll-area.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/select.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/separator.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/sheet.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/sidebar.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/skeleton.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/slider.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/sonner.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/switch.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/table.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/tabs.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/textarea.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/toast.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/toaster.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/toggle-group.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/toggle.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "components/ui/tooltip.tsx": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "hooks/use-toast.ts": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "lib/api.ts": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "lib/config.ts": {
+      "issues": [],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "lib/services.ts": {
+      "issues": [
+        {
+          "type": "dummy_data",
+          "pattern": "/dummy|mock|fake|test.*data/gi",
+          "match": "teStock(productId: string, data",
+          "line": 656
+        }
+      ],
+      "usesApiServices": true,
+      "hasContent": true
+    },
+    "lib/toast.ts": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "lib/utils.ts": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    },
+    "tailwind.config.ts": {
+      "issues": [],
+      "usesApiServices": false,
+      "hasContent": true
+    }
+  }
+}
