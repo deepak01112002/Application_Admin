@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { useState, useEffect } from "react";
-import { orderService } from "@/lib/services";
+import { dashboardService } from "@/lib/services";
 
 interface Order {
   id: string;
@@ -45,17 +45,9 @@ export function RecentOrders() {
   useEffect(() => {
     const fetchRecentOrders = async () => {
       try {
-        const response = await orderService.getOrders({ limit: 5 });
-        console.log('Recent orders response:', response);
-
-        // Handle different response formats
-        if (response.orders) {
-          setOrders(response.orders);
-        } else if (Array.isArray(response)) {
-          setOrders(response);
-        } else {
-          setOrders([]);
-        }
+        const recentOrders = await dashboardService.getRecentOrders();
+        console.log('Recent orders response:', recentOrders);
+        setOrders(recentOrders);
       } catch (err: any) {
         setError('Failed to load recent orders');
         console.error('Recent orders error:', err);

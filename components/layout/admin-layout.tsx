@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/ui/sidebar";
 import { authService } from "@/lib/services";
+import DirectQRModal from "@/components/qr-scanner/direct-qr-modal";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ interface AdminLayoutProps {
 export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayoutProps) {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showQRScanner, setShowQRScanner] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -136,6 +138,7 @@ export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayout
           onNavigate={handleNavigate}
           onLogout={handleLogout}
           currentUser={currentUser}
+          onOpenQRScanner={() => setShowQRScanner(true)}
         />
       </div>
 
@@ -146,6 +149,7 @@ export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayout
           onNavigate={handleNavigate}
           onLogout={handleLogout}
           currentUser={currentUser}
+          onOpenQRScanner={() => setShowQRScanner(true)}
         />
       </div>
 
@@ -157,6 +161,12 @@ export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayout
           </div>
         </div>
       </main>
+
+      {/* QR Scanner Modal */}
+      <DirectQRModal
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+      />
     </div>
   );
 }

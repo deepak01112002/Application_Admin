@@ -351,9 +351,14 @@ export const dashboardService = {
     return extractData(response);
   },
 
-  async getRecentOrders(): Promise<Order[]> {
-    const response = await api.get('/orders?limit=5');
+  async getDashboard(period: number = 30): Promise<any> {
+    const response = await api.get(`/admin/dashboard?period=${period}`);
     return extractData(response);
+  },
+
+  async getRecentOrders(): Promise<Order[]> {
+    const dashboardData = await this.getDashboard(30);
+    return dashboardData.dashboard.recentOrders || [];
   }
 };
 

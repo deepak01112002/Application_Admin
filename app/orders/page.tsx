@@ -11,6 +11,7 @@ import { orderService, adminManagementService } from "@/lib/services";
 import { toast } from "sonner";
 import { Loader2, Search, Eye, Edit, Package, Truck, CheckCircle, XCircle } from "lucide-react";
 import { AdminLayout } from "@/components/layout/admin-layout";
+import { OrderBillModal } from "@/components/orders/order-bill-modal";
 
 interface Order {
   _id: string;
@@ -67,6 +68,8 @@ export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [showBillModal, setShowBillModal] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -156,6 +159,16 @@ export default function OrdersPage() {
       style: 'currency',
       currency: 'INR'
     }).format(amount);
+  };
+
+  const handleViewBill = (order: Order) => {
+    setSelectedOrder(order);
+    setShowBillModal(true);
+  };
+
+  const handleCloseBillModal = () => {
+    setShowBillModal(false);
+    setSelectedOrder(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -256,7 +269,14 @@ export default function OrdersPage() {
                 // Safe property extraction with fallbacks
                 const StatusIcon = statusIcons[order.status as keyof typeof statusIcons] || Package;
                 const orderStatus = order.status || 'pending';
-                const orderTotal = order.pricing?.total || order.total || 0;
+                const orderTotal = order.pricing?.total ||
+                                 order.total ||
+                                 order.finalAmount ||
+                                 order.total_amount ||
+                                 (Array.isArray(order.items) ?
+                                   order.items.reduce((sum: number, item: any) =>
+                                     sum + ((item.totalPrice || item.unitPrice || item.price || 0) * (item.quantity || 1)), 0
+                                   ) : 0);
 
                 // Safe customer name extraction
                 let customerName = 'Unknown Customer';
@@ -307,7 +327,12 @@ export default function OrdersPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          title="View Invoice/Bill"
+                          onClick={() => handleViewBill(order)}
+                        >
                           <Eye className="w-4 h-4" />
                         </Button>
                         <Select
@@ -373,6 +398,13 @@ export default function OrdersPage() {
         </CardContent>
       </Card>
       </div>
+
+      {/* Order Bill Modal */}
+      <OrderBillModal
+        isOpen={showBillModal}
+        onClose={handleCloseBillModal}
+        order={selectedOrder}
+      />
     </AdminLayout>
   );
 }

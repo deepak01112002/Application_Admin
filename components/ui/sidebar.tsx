@@ -28,7 +28,8 @@ import {
   MessageSquare,
   Truck,
   Building,
-  Receipt
+  Receipt,
+  Scan
 } from "lucide-react";
 import { useState } from "react";
 
@@ -38,6 +39,7 @@ interface SidebarProps {
   onNavigate: (page: string) => void;
   onLogout?: () => void;
   currentUser?: any;
+  onOpenQRScanner?: () => void;
 }
 
 const sidebarItems = [
@@ -163,7 +165,7 @@ const sidebarItems = [
   },
 ];
 
-export function Sidebar({ className, currentPage, onNavigate, onLogout, currentUser }: SidebarProps) {
+export function Sidebar({ className, currentPage, onNavigate, onLogout, currentUser, onOpenQRScanner }: SidebarProps) {
   const [open, setOpen] = useState(false);
 
   const SidebarContent = () => (
@@ -264,6 +266,22 @@ export function Sidebar({ className, currentPage, onNavigate, onLogout, currentU
 
       {/* Footer */}
       <div className="p-4 border-t border-slate-200">
+        {/* QR Scanner Button */}
+        {onOpenQRScanner && (
+          <button
+            onClick={() => {
+              onOpenQRScanner();
+              setOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 mb-3 rounded-xl text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group"
+          >
+            <div className="p-2 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
+              <Scan className="w-5 h-5" />
+            </div>
+            <span className="font-medium">QR Scanner</span>
+          </button>
+        )}
+
         {onLogout && (
           <button
             onClick={() => {

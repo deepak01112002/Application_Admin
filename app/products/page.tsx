@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { productService, adminManagementService } from "@/lib/services";
 import { toast } from "sonner";
-import { Loader2, Search, Eye, Edit, Package, Plus, ToggleLeft, ToggleRight, Trash2 } from "lucide-react";
+import { Loader2, Search, Eye, Edit, Package, Plus, ToggleLeft, ToggleRight, Trash2, QrCode, Download } from "lucide-react";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { AddProductForm } from "@/components/products/add-product-form";
 import { EditProductForm } from "@/components/products/edit-product-form";
@@ -40,6 +40,9 @@ export default function ProductsPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [generatingQR, setGeneratingQR] = useState<string | null>(null);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrCodeData, setQrCodeData] = useState<any>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -143,6 +146,145 @@ export default function ProductsPage() {
     }).format(amount);
   };
 
+  const generateProductQR = async (productId: string) => {
+    try {
+      setGeneratingQR(productId);
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('adminToken');
+
+      if (!token) {
+        toast.error('Authentication required. Please login again.');
+        return;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/qr-codes/product/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate QR code');
+      }
+
+      const data = await response.json();
+      setQrCodeData(data);
+      setShowQRModal(true);
+      toast.success('QR code generated successfully!');
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      toast.error('Failed to generate QR code');
+    } finally {
+      setGeneratingQR(null);
+    }
+  };
+
+  const generateAllProductQRs = async () => {
+    try {
+      setGeneratingQR('all');
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('adminToken');
+
+      if (!token) {
+        toast.error('Authentication required. Please login again.');
+        return;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/qr-codes/products/all`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate QR codes');
+      }
+
+      const data = await response.json();
+      toast.success(`Generated QR codes for ${data.results.filter((r: any) => !r.error).length} products!`);
+    } catch (error) {
+      console.error('Error generating QR codes:', error);
+      toast.error('Failed to generate QR codes');
+    } finally {
+      setGeneratingQR(null);
+    }
+  };
+
+  const downloadQRCode = (downloadUrl: string, filename: string) => {
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('QR code downloaded successfully!');
+  };
+
+  const printQRCode = (qrCodeData: any) => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print QR Code - ${qrCodeData.product.name}</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding: 20px;
+                margin: 0;
+              }
+              .qr-container {
+                display: inline-block;
+                border: 2px solid #000;
+                padding: 20px;
+                margin: 20px;
+              }
+              .qr-code {
+                max-width: 300px;
+                height: auto;
+              }
+              .product-info {
+                margin-top: 15px;
+                font-size: 16px;
+                font-weight: bold;
+              }
+              .company-info {
+                margin-top: 10px;
+                font-size: 12px;
+                color: #666;
+              }
+              @media print {
+                body { margin: 0; }
+                .qr-container {
+                  border: 2px solid #000;
+                  page-break-inside: avoid;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="qr-container">
+              <img src="${qrCodeData.qrCode.dataURL}" alt="QR Code" class="qr-code" />
+              <div class="product-info">${qrCodeData.product.name}</div>
+              <div class="company-info">GHANSHYAM MURTI BHANDAR</div>
+              <div class="company-info">Product QR Code</div>
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+      toast.success('QR code sent to printer!');
+    }
+  };
+
   if (loading && products.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -159,10 +301,24 @@ export default function ProductsPage() {
             <h1 className="text-3xl font-bold">Products Management</h1>
             <p className="text-muted-foreground">Manage your product catalog.</p>
           </div>
-          <Button onClick={() => setShowAddModal(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Product
-        </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={generateAllProductQRs}
+              disabled={generatingQR === 'all'}
+            >
+              {generatingQR === 'all' ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <QrCode className="w-4 h-4 mr-2" />
+              )}
+              Generate All QR Codes
+            </Button>
+            <Button onClick={() => setShowAddModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Product
+            </Button>
+          </div>
         </div>
 
       {/* Search */}
@@ -243,6 +399,19 @@ export default function ProductsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => generateProductQR(product._id)}
+                        disabled={generatingQR === product._id}
+                        title="Generate QR Code"
+                      >
+                        {generatingQR === product._id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <QrCode className="w-4 h-4" />
+                        )}
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
@@ -350,6 +519,47 @@ export default function ProductsPage() {
               }}
               onProductUpdated={handleProductUpdated}
             />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* QR Code Modal */}
+      <Dialog open={showQRModal} onOpenChange={setShowQRModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Product QR Code</DialogTitle>
+          </DialogHeader>
+          {qrCodeData && (
+            <div className="space-y-4">
+              <div className="text-center">
+                <img
+                  src={qrCodeData.qrCode.dataURL}
+                  alt="Product QR Code"
+                  className="mx-auto border border-gray-300 rounded"
+                />
+              </div>
+              <div className="text-center">
+                <h3 className="font-medium">{qrCodeData.product.name}</h3>
+                <p className="text-sm text-gray-600">Product QR Code</p>
+              </div>
+              <div className="flex gap-2 justify-center">
+                <Button
+                  onClick={() => downloadQRCode(qrCodeData.qrCode.downloadUrl, `product-qr-${qrCodeData.product.name}.png`)}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => printQRCode(qrCodeData)}
+                  className="flex items-center gap-2"
+                >
+                  <QrCode className="w-4 h-4" />
+                  Print
+                </Button>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
