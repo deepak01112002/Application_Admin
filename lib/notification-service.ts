@@ -140,14 +140,43 @@ class NotificationService {
 
   private playNotificationSound() {
     try {
-      // Create audio element for notification sound
+      // Try to play notification sound file first
       const audio = new Audio('/sounds/notification.mp3');
       audio.volume = 0.5;
       audio.play().catch((error) => {
-        console.log('Could not play notification sound:', error);
+        console.log('Could not play notification sound file:', error);
+        // Fallback to system beep or simple tone
+        this.playFallbackSound();
       });
     } catch (error) {
       console.log('Notification sound not available:', error);
+      // Fallback to system beep or simple tone
+      this.playFallbackSound();
+    }
+  }
+
+  private playFallbackSound() {
+    try {
+      // Create a simple beep sound using Web Audio API
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 800; // 800 Hz tone
+      oscillator.type = 'sine';
+
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+
+      console.log('🔊 Played fallback notification sound');
+    } catch (error) {
+      console.log('Could not play fallback sound:', error);
     }
   }
 
