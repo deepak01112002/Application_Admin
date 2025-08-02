@@ -77,22 +77,32 @@ export const requestNotificationPermission = async () => {
 // Save FCM token to backend
 const saveTokenToBackend = async (token: string) => {
   try {
-    const response = await fetch('/api/admin/fcm-token', {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+    const authToken = localStorage.getItem('token') || localStorage.getItem('authToken');
+
+    console.log('Saving FCM token to backend:', token);
+    console.log('Using API URL:', `${API_BASE_URL}/notifications/admin/fcm-token`);
+    console.log('Auth token available:', !!authToken);
+
+    const response = await fetch(`${API_BASE_URL}/notifications/admin/fcm-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        'Authorization': `Bearer ${authToken}`
       },
       body: JSON.stringify({ fcmToken: token })
     });
-    
+
+    const result = await response.json();
+    console.log('FCM token save response:', result);
+
     if (response.ok) {
-      console.log('FCM token saved to backend');
+      console.log('✅ FCM token saved to backend successfully');
     } else {
-      console.error('Failed to save FCM token to backend');
+      console.error('❌ Failed to save FCM token to backend:', result);
     }
   } catch (error) {
-    console.error('Error saving FCM token:', error);
+    console.error('❌ Error saving FCM token:', error);
   }
 };
 
