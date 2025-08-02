@@ -48,6 +48,15 @@ export default function InventoryPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [newStock, setNewStock] = useState(0);
   const [updating, setUpdating] = useState(false);
+  // Bulk operations
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [bulkOperation, setBulkOperation] = useState<'add' | 'subtract' | 'set'>('add');
+  const [bulkValue, setBulkValue] = useState(0);
+  const [bulkUpdating, setBulkUpdating] = useState(false);
+  // Low stock alerts
+  const [lowStockThreshold, setLowStockThreshold] = useState(10);
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -114,21 +123,89 @@ export default function InventoryPage() {
 
   const getStockStatus = (stock: number) => {
     if (stock === 0) return { label: 'Out of Stock', color: 'bg-red-100 text-red-800', icon: AlertTriangle };
-    if (stock < 10) return { label: 'Low Stock', color: 'bg-yellow-100 text-yellow-800', icon: TrendingDown };
+    if (stock < lowStockThreshold) return { label: 'Low Stock', color: 'bg-yellow-100 text-yellow-800', icon: TrendingDown };
     return { label: 'In Stock', color: 'bg-green-100 text-green-800', icon: TrendingUp };
   };
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Bulk operations
+  const handleSelectProduct = (productId: string) => {
+    setSelectedProducts(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    const visibleProductIds = filteredProducts.map(p => p._id);
+    setSelectedProducts(prev =>
+      prev.length === visibleProductIds.length
+        ? []
+        : visibleProductIds
+    );
+  };
+
+  const handleBulkUpdate = async () => {
+    if (selectedProducts.length === 0) {
+      toast.error('Please select products to update');
+      return;
+    }
+
+    try {
+      setBulkUpdating(true);
+
+      // Update each selected product
+      const updatePromises = selectedProducts.map(async (productId) => {
+        const product = products.find(p => p._id === productId);
+        if (!product) return;
+
+        let newStockValue = product.stock;
+        switch (bulkOperation) {
+          case 'add':
+            newStockValue = product.stock + bulkValue;
+            break;
+          case 'subtract':
+            newStockValue = Math.max(0, product.stock - bulkValue);
+            break;
+          case 'set':
+            newStockValue = bulkValue;
+            break;
+        }
+
+        return productService.updateInventory(productId, newStockValue);
+      });
+
+      await Promise.all(updatePromises);
+
+      toast.success(`Successfully updated ${selectedProducts.length} products`);
+      setShowBulkModal(false);
+      setSelectedProducts([]);
+      setBulkValue(0);
+      fetchProducts();
+    } catch (error) {
+      toast.error('Failed to update products');
+      console.error('Bulk update error:', error);
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStockFilter = !showLowStockOnly || product.stock < lowStockThreshold;
+
+    return matchesSearch && matchesStockFilter;
+  });
 
   // Calculate inventory stats
   const totalProducts = products.length;
   const inStockProducts = products.filter(p => p.stock > 0).length;
-  const lowStockProducts = products.filter(p => p.stock > 0 && p.stock < 10).length;
+  const lowStockProducts = products.filter(p => p.stock > 0 && p.stock < lowStockThreshold).length;
   const outOfStockProducts = products.filter(p => p.stock === 0).length;
+  const totalInventoryValue = products.reduce((sum, p) => sum + (p.stock * p.price), 0);
   const totalStockValue = products.reduce((sum, p) => sum + (p.stock * p.price), 0);
 
   if (loading) {
@@ -204,17 +281,54 @@ export default function InventoryPage() {
           </Card>
         </div>
 
-        {/* Search */}
+        {/* Search and Controls */}
         <Card>
           <CardContent className="pt-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search products by name, SKU, or category..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant={showLowStockOnly ? "default" : "outline"}
+                  onClick={() => setShowLowStockOnly(!showLowStockOnly)}
+                  className="whitespace-nowrap"
+                >
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  Low Stock Only
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowBulkModal(true)}
+                  disabled={selectedProducts.length === 0}
+                  className="whitespace-nowrap"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Bulk Update ({selectedProducts.length})
+                </Button>
+              </div>
+            </div>
+
+            {/* Low Stock Threshold Setting */}
+            <div className="mt-4 flex items-center gap-4">
+              <Label htmlFor="threshold" className="text-sm">Low Stock Threshold:</Label>
               <Input
-                placeholder="Search products by name, SKU, or category..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                id="threshold"
+                type="number"
+                value={lowStockThreshold}
+                onChange={(e) => setLowStockThreshold(Number(e.target.value))}
+                className="w-20"
+                min="1"
               />
+              <span className="text-sm text-muted-foreground">
+                Products with stock below this value will be marked as low stock
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -231,6 +345,14 @@ export default function InventoryPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <input
+                      type="checkbox"
+                      checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
+                      onChange={handleSelectAll}
+                      className="rounded"
+                    />
+                  </TableHead>
                   <TableHead>Product</TableHead>
                   <TableHead>SKU</TableHead>
                   <TableHead>Category</TableHead>
@@ -248,6 +370,14 @@ export default function InventoryPage() {
 
                   return (
                     <TableRow key={product._id}>
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={selectedProducts.includes(product._id)}
+                          onChange={() => handleSelectProduct(product._id)}
+                          className="rounded"
+                        />
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           {product.images && product.images[0] && (
@@ -377,6 +507,69 @@ export default function InventoryPage() {
                   )}
                 </Button>
         </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Bulk Update Modal */}
+        <Dialog open={showBulkModal} onOpenChange={setShowBulkModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Bulk Update Inventory</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Selected Products: {selectedProducts.length}</Label>
+                <p className="text-sm text-muted-foreground">
+                  This will update the stock for all selected products
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="operation">Operation</Label>
+                <select
+                  id="operation"
+                  value={bulkOperation}
+                  onChange={(e) => setBulkOperation(e.target.value as 'add' | 'subtract' | 'set')}
+                  className="w-full mt-1 p-2 border rounded-md"
+                >
+                  <option value="add">Add to current stock</option>
+                  <option value="subtract">Subtract from current stock</option>
+                  <option value="set">Set stock to specific value</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="bulkValue">
+                  {bulkOperation === 'add' ? 'Amount to Add' :
+                   bulkOperation === 'subtract' ? 'Amount to Subtract' :
+                   'New Stock Value'}
+                </Label>
+                <Input
+                  id="bulkValue"
+                  type="number"
+                  value={bulkValue}
+                  onChange={(e) => setBulkValue(Number(e.target.value))}
+                  min="0"
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowBulkModal(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleBulkUpdate} disabled={bulkUpdating}>
+                  {bulkUpdating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    'Update Selected Products'
+                  )}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

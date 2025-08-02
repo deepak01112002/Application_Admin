@@ -9,8 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { productService, adminManagementService } from "@/lib/services";
 import { toast } from "sonner";
-import { Loader2, Search, Eye, Edit, Package, Plus, ToggleLeft, ToggleRight, Trash2, QrCode, Download } from "lucide-react";
+import { Loader2, Search, Eye, Edit, Package, Plus, ToggleLeft, ToggleRight, Trash2, QrCode, Download, Upload } from "lucide-react";
 import { AdminLayout } from "@/components/layout/admin-layout";
+import { BulkUploadModal } from "@/components/products/bulk-upload-modal";
 import { AddProductForm } from "@/components/products/add-product-form";
 import { EditProductForm } from "@/components/products/edit-product-form";
 
@@ -37,6 +38,7 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -130,6 +132,12 @@ export default function ProductsPage() {
     setShowAddModal(false);
     fetchProducts();
     toast.success('Product added successfully');
+  };
+
+  const handleBulkUploadSuccess = () => {
+    setShowBulkUploadModal(false);
+    fetchProducts();
+    toast.success('Bulk upload completed successfully');
   };
 
   const handleProductUpdated = () => {
@@ -313,6 +321,10 @@ export default function ProductsPage() {
                 <QrCode className="w-4 h-4 mr-2" />
               )}
               Generate All QR Codes
+            </Button>
+            <Button variant="outline" onClick={() => setShowBulkUploadModal(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Bulk Upload
             </Button>
             <Button onClick={() => setShowAddModal(true)}>
               <Plus className="w-4 h-4 mr-2" />
@@ -563,6 +575,13 @@ export default function ProductsPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Upload Modal */}
+      <BulkUploadModal
+        isOpen={showBulkUploadModal}
+        onClose={() => setShowBulkUploadModal(false)}
+        onSuccess={handleBulkUploadSuccess}
+      />
     </AdminLayout>
   );
 }
