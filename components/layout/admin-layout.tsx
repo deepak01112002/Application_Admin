@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/ui/sidebar";
 import { authService } from "@/lib/services";
+import { notificationService } from "@/lib/notification-service";
 import DirectQRModal from "@/components/qr-scanner/direct-qr-modal";
 
 interface AdminLayoutProps {
@@ -31,6 +32,13 @@ export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayout
             avatar: null,
             role: profile.user.role
           });
+
+          // Initialize notifications after successful auth
+          try {
+            await notificationService.initialize();
+          } catch (notificationError) {
+            console.error('Failed to initialize notifications:', notificationError);
+          }
         } else {
           // Not authenticated or not admin, redirect to login
           router.push('/');

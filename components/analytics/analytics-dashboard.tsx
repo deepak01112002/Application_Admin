@@ -16,15 +16,35 @@ interface AnalyticsData {
   ordersGrowth: number;
   customersGrowth: number;
   conversionGrowth: number;
+  // Enhanced profit and returns tracking
+  totalProfit: number;
+  profitMargin: number;
+  profitGrowth: number;
+  totalReturns: number;
+  returnRate: number;
+  returnValue: number;
+  returnsGrowth: number;
+  // Cost analysis
+  totalCosts: number;
+  costOfGoodsSold: number;
+  operatingExpenses: number;
+  // Inventory insights
+  totalProducts: number;
+  lowStockProducts: number;
+  outOfStockProducts: number;
+  inventoryValue: number;
   topProducts: Array<{
     name: string;
     sales: number;
     revenue: string;
+    profit: number;
+    profitMargin: number;
   }>;
   customerInsights: {
     returningCustomers: number;
     averageOrderValue: number;
     customerLifetimeValue: number;
+    customerAcquisitionCost: number;
   };
   trafficSources: Array<{
     source: string;
@@ -35,6 +55,14 @@ interface AnalyticsData {
     type: string;
     message: string;
     color: string;
+  }>;
+  // Monthly trends
+  monthlyData: Array<{
+    month: string;
+    revenue: number;
+    profit: number;
+    orders: number;
+    returns: number;
   }>;
 }
 
@@ -211,6 +239,69 @@ export function AnalyticsDashboard() {
             </div>
             <div className="bg-white/20 p-3 rounded-lg">
               <BarChart3 className="w-8 h-8" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Metrics - Profit, Returns, Inventory */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-emerald-100">Total Profit</p>
+              <p className="text-3xl font-bold">₹{analytics.totalProfit?.toLocaleString() || '0'}</p>
+              <p className="text-emerald-100 text-sm">
+                {analytics.profitMargin?.toFixed(1) || '0'}% margin (+{analytics.profitGrowth || 0}%)
+              </p>
+            </div>
+            <div className="bg-white/20 p-3 rounded-lg">
+              <TrendingUp className="w-8 h-8" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-red-100">Returns</p>
+              <p className="text-3xl font-bold">{analytics.totalReturns?.toLocaleString() || '0'}</p>
+              <p className="text-red-100 text-sm">
+                {analytics.returnRate?.toFixed(1) || '0'}% rate (₹{analytics.returnValue?.toLocaleString() || '0'})
+              </p>
+            </div>
+            <div className="bg-white/20 p-3 rounded-lg">
+              <Package className="w-8 h-8" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-indigo-100">Inventory Value</p>
+              <p className="text-3xl font-bold">₹{analytics.inventoryValue?.toLocaleString() || '0'}</p>
+              <p className="text-indigo-100 text-sm">
+                {analytics.totalProducts || 0} products ({analytics.lowStockProducts || 0} low stock)
+              </p>
+            </div>
+            <div className="bg-white/20 p-3 rounded-lg">
+              <Package className="w-8 h-8" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-teal-100">Avg Order Value</p>
+              <p className="text-3xl font-bold">₹{analytics.customerInsights?.averageOrderValue?.toLocaleString() || '0'}</p>
+              <p className="text-teal-100 text-sm">
+                CLV: ₹{analytics.customerInsights?.customerLifetimeValue?.toLocaleString() || '0'}
+              </p>
+            </div>
+            <div className="bg-white/20 p-3 rounded-lg">
+              <DollarSign className="w-8 h-8" />
             </div>
           </div>
         </div>

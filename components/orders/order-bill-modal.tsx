@@ -17,14 +17,22 @@ interface OrderBillModalProps {
 export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) {
   const [isPrinting, setIsPrinting] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const [signatureUrl, setSignatureUrl] = useState<string>('');
   const billRef = useRef<HTMLDivElement>(null);
+  const thermalBillRef = useRef<HTMLDivElement>(null);
 
-  // Generate QR code when modal opens
+  // Generate QR code and load signature when modal opens
   useEffect(() => {
     if (isOpen && order) {
       generateQRCode();
+      loadSignature();
     }
   }, [isOpen, order]);
+
+  const loadSignature = () => {
+    // Load the signature image
+    setSignatureUrl('/Signature_GM.jpeg');
+  };
 
   const generateQRCode = async () => {
     try {
@@ -71,25 +79,40 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
   });
 
   const handleThermalPrint = () => {
-    // For thermal printer (4x6 inch)
+    console.log('Thermal print clicked');
+    console.log('Order:', order);
+    console.log('thermalBillRef.current:', thermalBillRef.current);
+
+    if (!thermalBillRef.current) {
+      console.error('Thermal bill ref is null');
+      alert('Thermal bill content not found. Please try again.');
+      return;
+    }
+
+    // For thermal printer (4x6 inch) - use separate thermal bill format
     const printWindow = window.open('', '_blank');
-    if (printWindow && billRef.current) {
+    if (printWindow) {
+      const thermalContent = thermalBillRef.current.innerHTML;
+      console.log('Thermal content length:', thermalContent.length);
+
       printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Invoice-${order?.orderNumber}</title>
+          <title>Thermal-Bill-${order?.orderNumber}</title>
           <style>
-            @page { 
-              size: 4in 6in; 
-              margin: 0.1in; 
+            @page {
+              size: 4in 6in;
+              margin: 0.1in;
             }
-            body { 
+            body {
               font-family: 'Courier New', monospace;
               font-size: 9px;
               line-height: 1.1;
               margin: 0;
               padding: 2px;
+              background: white;
+              color: black;
             }
             .header { text-align: center; font-weight: bold; margin-bottom: 8px; }
             .company-name { font-size: 12px; font-weight: bold; }
@@ -103,16 +126,42 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
             table { width: 100%; border-collapse: collapse; font-size: 8px; }
             th, td { padding: 1px 2px; text-align: left; }
             .barcode { font-family: 'Libre Barcode 128', monospace; font-size: 24px; text-align: center; }
+            .qr-section { text-align: center; margin: 8px 0; }
+            .signature-section { margin-top: 10px; text-align: right; }
+            .text-center { text-align: center; }
+            .text-right { text-align: right; }
+            .font-bold { font-weight: bold; }
+            .text-xs { font-size: 8px; }
+            .text-sm { font-size: 10px; }
+            .mb-1 { margin-bottom: 4px; }
+            .mb-2 { margin-bottom: 8px; }
+            .mt-2 { margin-top: 8px; }
+            .border-b { border-bottom: 1px dashed #000; }
+            .py-1 { padding: 2px 0; }
+            .flex { display: flex; }
+            .justify-between { justify-content: space-between; }
+            .items-center { align-items: center; }
+            .border-dashed { border-style: dashed; }
+            .border-gray-400 { border-color: #9ca3af; }
+            .pb-1 { padding-bottom: 4px; }
+            .pb-2 { padding-bottom: 8px; }
           </style>
         </head>
         <body>
-          ${billRef.current.innerHTML}
+          ${thermalContent}
         </body>
         </html>
       `);
       printWindow.document.close();
-      printWindow.print();
-      printWindow.close();
+
+      // Wait for content to load before printing
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 500);
+    } else {
+      console.error('Failed to open print window');
+      alert('Failed to open print window. Please check popup blockers.');
     }
   };
 
@@ -228,7 +277,7 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
           </div>
         </DialogHeader>
 
-        {/* Invoice Content */}
+        {/* A4 Tax Invoice Content */}
         <div ref={billRef} className="bg-white p-6 text-black">
           {/* Header */}
           <div className="header text-center mb-6">
@@ -351,6 +400,15 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
             <div>
               <div className="font-bold mb-2">For GHANSHYAM MURTI BHANDAR:</div>
               <div className="mt-8">
+                {signatureUrl && (
+                  <div className="mb-2">
+                    <img
+                      src={signatureUrl}
+                      alt="Authorized Signature"
+                      className="h-12 w-auto mx-auto"
+                    />
+                  </div>
+                )}
                 <div className="border-t border-gray-400 pt-2 text-center">Authorized Signatory</div>
               </div>
             </div>
@@ -414,6 +472,149 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
           <div className="print-only hidden mt-4 text-center">
             <div className="barcode">*{order.orderNumber || order._id}*</div>
             <div className="text-xs">AWB {order.shipping?.awbCode || 'PENDING'}</div>
+          </div>
+        </div>
+
+        {/* Thermal Bill Format (4x6 inch) - Temporarily visible for debugging */}
+        <div ref={thermalBillRef} className="bg-white p-2 text-black border-2 border-red-500 mt-4" style={{ width: '4in', fontSize: '9px', lineHeight: '1.1' }}>
+          {/* Thermal Header */}
+          <div className="text-center mb-2">
+            <div className="font-bold text-sm">GHANSHYAM MURTI BHANDAR</div>
+            <div className="text-xs">CANAL ROAD vasudhra soc, block no 193</div>
+            <div className="text-xs">near jilla garden cancal road</div>
+            <div className="text-xs">Rajkot, GUJARAT, 360002</div>
+            <div className="text-xs">GST: 24BYAPD0171N1ZP</div>
+            <div className="text-xs border-b border-dashed border-gray-400 pb-1 mb-2">
+              Bill/Invoice
+            </div>
+          </div>
+
+          {/* Order Details */}
+          <div className="mb-2 text-xs">
+            <div className="flex justify-between">
+              <span>Order:</span>
+              <span>{order.orderNumber || order._id}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Date:</span>
+              <span>{formatDate(order.createdAt)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Customer:</span>
+              <span>{customerName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Phone:</span>
+              <span>{customerPhone}</span>
+            </div>
+          </div>
+
+          {/* Items */}
+          <div className="border-b border-dashed border-gray-400 pb-2 mb-2">
+            <div className="text-xs font-bold mb-1">Items:</div>
+            {order.items?.map((item: any, index: number) => {
+              const itemTotal = item.totalPrice || (item.price * item.quantity) || 0;
+              const product = item.product || {};
+              const specs = product.specifications || {};
+
+              return (
+                <div key={index} className="mb-1 text-xs">
+                  <div className="font-medium">{product.name || item.name || 'Product'}</div>
+                  <div className="flex justify-between">
+                    <span>Qty: {item.quantity || 1}</span>
+                    <span>₹{(item.price || item.unitPrice || 0).toFixed(2)}</span>
+                  </div>
+                  {specs.height && <div className="text-xs text-gray-600">H: {specs.height}</div>}
+                  {specs.weight && <div className="text-xs text-gray-600">W: {specs.weight}</div>}
+                  <div className="flex justify-between font-medium">
+                    <span>Total:</span>
+                    <span>₹{itemTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Totals */}
+          <div className="mb-2 text-xs">
+            <div className="flex justify-between">
+              <span>Subtotal:</span>
+              <span>₹{subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>GST (18%):</span>
+              <span>₹{tax.toFixed(2)}</span>
+            </div>
+            {shipping > 0 && (
+              <div className="flex justify-between">
+                <span>Shipping:</span>
+                <span>₹{shipping.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex justify-between font-bold border-t border-dashed border-gray-400 pt-1">
+              <span>TOTAL:</span>
+              <span>₹{total.toFixed(2)}</span>
+            </div>
+          </div>
+
+          {/* Payment Info */}
+          <div className="mb-2 text-xs border-b border-dashed border-gray-400 pb-2">
+            <div className="flex justify-between">
+              <span>Payment:</span>
+              <span>{order.paymentInfo?.method?.toUpperCase() || 'COD'}</span>
+            </div>
+            {order.paymentInfo?.razorpayPaymentId && (
+              <div className="flex justify-between">
+                <span>TxnID:</span>
+                <span>{order.paymentInfo.razorpayPaymentId.slice(-8)}</span>
+              </div>
+            )}
+          </div>
+
+          {/* QR Code for Box Label */}
+          <div className="text-center mb-2">
+            {qrCodeUrl ? (
+              <div>
+                <img
+                  src={qrCodeUrl}
+                  alt="Order QR Code"
+                  className="w-16 h-16 mx-auto border border-gray-300"
+                />
+                <div className="text-xs mt-1">Scan for Tracking</div>
+              </div>
+            ) : (
+              <div className="w-16 h-16 mx-auto border border-gray-300 flex items-center justify-center bg-gray-100">
+                <QrCode className="h-6 w-6 text-gray-400" />
+              </div>
+            )}
+          </div>
+
+          {/* Signature */}
+          <div className="text-right mb-2">
+            {signatureUrl && (
+              <div className="inline-block">
+                <img
+                  src={signatureUrl}
+                  alt="Signature"
+                  className="h-8 w-auto"
+                />
+                <div className="text-xs border-t border-gray-400 pt-1 mt-1">
+                  Authorized
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="text-center text-xs border-t border-dashed border-gray-400 pt-1">
+            <div>Thank you for your business!</div>
+            <div>Visit: ghanshyammurtibhandar.com</div>
+          </div>
+
+          {/* Barcode for Box Label */}
+          <div className="text-center mt-2">
+            <div className="font-mono text-lg">*{order.orderNumber || order._id}*</div>
+            <div className="text-xs">AWB: {order.shipping?.awbCode || 'PENDING'}</div>
           </div>
         </div>
       </DialogContent>

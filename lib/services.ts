@@ -281,6 +281,27 @@ export const productService = {
   async updateInventory(id: string, stock: number): Promise<Product> {
     const response = await api.patch(`/products/${id}/inventory`, { stock, operation: 'set' });
     return extractData(response);
+  },
+
+  async bulkUpload(formData: FormData): Promise<any> {
+    try {
+      const response = await api.post('/products/bulk-upload', formData);
+      return {
+        success: true,
+        data: extractData(response)
+      };
+    } catch (error: any) {
+      console.error('Bulk upload error:', error);
+      return {
+        success: false,
+        message: error.message || 'Bulk upload failed',
+        data: {
+          success: 0,
+          failed: 1,
+          errors: [error.message || 'Upload failed']
+        }
+      };
+    }
   }
 };
 

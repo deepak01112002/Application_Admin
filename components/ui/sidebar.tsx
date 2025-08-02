@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import {
   BarChart3,
   Box,
@@ -201,9 +202,12 @@ export function Sidebar({ className, currentPage, onNavigate, onLogout, currentU
                 {currentUser.email || 'admin@example.com'}
               </p>
             </div>
-            <Badge variant="secondary" className="text-xs">
-              Admin
-            </Badge>
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <Badge variant="secondary" className="text-xs">
+                Admin
+              </Badge>
+            </div>
           </div>
         </div>
       )}
