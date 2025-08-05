@@ -100,6 +100,12 @@ export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayout
       case "analytics":
         router.push("/analytics");
         break;
+      case "social-media":
+        router.push("/admin/social-media");
+        break;
+      case "app-settings":
+        router.push("/admin/app-settings");
+        break;
       case "settings":
         router.push("/settings");
         break;

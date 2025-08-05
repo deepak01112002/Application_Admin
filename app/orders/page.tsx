@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Loader2, Search, Eye, Edit, Package, Truck, CheckCircle, XCircle } from "lucide-react";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { OrderBillModal } from "@/components/orders/order-bill-modal";
+import { DeliveryManagement } from "@/components/orders/delivery-management";
 
 interface Order {
   _id: string;
@@ -33,6 +34,22 @@ interface Order {
     tax?: number;
     shipping?: number;
     total?: number;
+  };
+  shipping?: {
+    deliveryMethod?: 'manual' | 'delhivery';
+    carrier?: string;
+    trackingNumber?: string;
+    assignedBy?: string;
+    assignedAt?: string;
+    adminNotes?: string;
+    delhiveryRefNum?: string;
+    trackingUrl?: string;
+    delhiveryStatus?: string;
+    delhiveryRemarks?: string;
+    currentLocation?: string;
+    estimatedDelivery?: string;
+    lastTracked?: string;
+    delhiveryError?: string;
   };
   status?: string;
   orderDate?: string;
@@ -70,6 +87,11 @@ export default function OrdersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showBillModal, setShowBillModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'orders' | 'delivery'>('orders');
+  const [updatingDelivery, setUpdatingDelivery] = useState<string | null>(null);
+  const [syncingDelhivery, setSyncingDelhivery] = useState<string | null>(null);
+  const [syncingAll, setSyncingAll] = useState(false);
+  const [deliveryMethodOverrides, setDeliveryMethodOverrides] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchOrders();
@@ -91,9 +113,10 @@ export default function OrdersPage() {
         params.search = searchTerm;
       }
 
-      console.log('Fetching orders with params:', params);
+      console.log('🔄 Fetching orders with params:', params);
+      console.log('🔄 Current deliveryMethodOverrides before fetch:', deliveryMethodOverrides);
       const response = await orderService.getOrders(params);
-      console.log('Orders API response:', response);
+      console.log('📋 Orders API response:', response);
 
       // Enhanced data validation and extraction
       let ordersData = [];
@@ -154,6 +177,100 @@ export default function OrdersPage() {
     }
   };
 
+  const updateDeliveryMethod = async (orderId: string, deliveryMethod: string) => {
+    console.log(`🔄 Starting delivery method update: ${orderId} → ${deliveryMethod}`);
+
+    try {
+      setUpdatingDelivery(orderId);
+
+      // Immediately update the override state for instant UI feedback
+      setDeliveryMethodOverrides(prev => ({
+        ...prev,
+        [orderId]: deliveryMethod
+      }));
+
+      console.log(`🔄 Override set for ${orderId}: ${deliveryMethod}`);
+
+      // Make API call
+      const result = await orderService.updateOrderDeliveryMethod(orderId, deliveryMethod, 'Updated via admin panel');
+      console.log('✅ API call successful:', result);
+
+      // Update the main orders state
+      setOrders(prevOrders => {
+        const updatedOrders = prevOrders.map(order => {
+          if (order._id === orderId) {
+            console.log(`🔄 Updating order ${orderId} from ${order.shipping?.deliveryMethod || 'manual'} to ${deliveryMethod}`);
+            return {
+              ...order,
+              shipping: {
+                ...order.shipping,
+                deliveryMethod: deliveryMethod,
+                carrier: deliveryMethod === 'delhivery' ? 'Delhivery' : 'Manual Delivery',
+                assignedAt: new Date().toISOString(),
+                adminNotes: 'Updated via admin panel',
+                trackingNumber: deliveryMethod === 'delhivery' ? `DHL${Date.now()}` : null
+              },
+              updatedAt: new Date().toISOString()
+            };
+          }
+          return order;
+        });
+        console.log('🔄 State updated, triggering re-render');
+        return updatedOrders;
+      });
+
+      // Clear the override since the main state is now updated
+      setDeliveryMethodOverrides(prev => {
+        const newOverrides = { ...prev };
+        delete newOverrides[orderId];
+        return newOverrides;
+      });
+
+      toast.success(`Delivery method updated to ${deliveryMethod}`);
+
+    } catch (error) {
+      toast.error('Failed to update delivery method');
+      console.error('Delivery update error:', error);
+
+      // Clear the override on error
+      setDeliveryMethodOverrides(prev => {
+        const newOverrides = { ...prev };
+        delete newOverrides[orderId];
+        return newOverrides;
+      });
+    } finally {
+      setUpdatingDelivery(null);
+    }
+  };
+
+  const syncDelhiveryStatus = async (orderId: string) => {
+    try {
+      setSyncingDelhivery(orderId);
+      await orderService.syncDelhiveryStatus(orderId);
+      toast.success('Delhivery status synced successfully');
+      fetchOrders();
+    } catch (error) {
+      toast.error('Failed to sync Delhivery status');
+      console.error('Sync error:', error);
+    } finally {
+      setSyncingDelhivery(null);
+    }
+  };
+
+  const syncAllDelhiveryOrders = async () => {
+    try {
+      setSyncingAll(true);
+      const result = await orderService.syncAllDelhiveryOrders();
+      toast.success(`Synced ${result.syncedCount} Delhivery orders successfully`);
+      fetchOrders();
+    } catch (error) {
+      toast.error('Failed to sync all Delhivery orders');
+      console.error('Bulk sync error:', error);
+    } finally {
+      setSyncingAll(false);
+    }
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -192,13 +309,55 @@ export default function OrdersPage() {
   return (
       <AdminLayout currentPage="orders">
         <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">Orders Management</h1>
-            <p className="text-muted-foreground">Manage and track all customer orders.</p>
-        </div>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold">Orders Management</h1>
+              <p className="text-muted-foreground">Manage and track all customer orders.</p>
+            </div>
+            <Button
+              onClick={syncAllDelhiveryOrders}
+              disabled={syncingAll}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              {syncingAll ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Package className="h-4 w-4" />
+              )}
+              {syncingAll ? 'Syncing...' : 'Sync All Delhivery'}
+            </Button>
+          </div>
 
-      {/* Filters */}
-      <Card>
+          {/* Tabs */}
+          <div className="flex space-x-1 bg-muted p-1 rounded-lg w-fit">
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'orders'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Orders Table
+            </button>
+            <button
+              onClick={() => setActiveTab('delivery')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'delivery'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Delivery Management
+            </button>
+          </div>
+
+          {/* Orders Table Tab */}
+          {activeTab === 'orders' && (
+            <>
+              {/* Filters */}
+              <Card>
         <CardHeader>
           <CardTitle>Filters</CardTitle>
         </CardHeader>
@@ -248,6 +407,7 @@ export default function OrdersPage() {
                 <TableHead>Items</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Delivery</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -323,6 +483,91 @@ export default function OrdersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
+                      <div className="space-y-1">
+                        {(() => {
+                          const currentDeliveryMethod = deliveryMethodOverrides[orderId] || order.shipping?.deliveryMethod || 'manual';
+                          console.log(`🔍 Rendering dropdown for ${orderId}: override=${deliveryMethodOverrides[orderId]}, order=${order.shipping?.deliveryMethod}, final=${currentDeliveryMethod}`);
+
+                          return (
+                            <Select
+                              key={`delivery-${orderId}-${currentDeliveryMethod}`}
+                              value={currentDeliveryMethod}
+                              onValueChange={(value) => {
+                                console.log(`🔄 Dropdown changed for order ${orderId}: ${currentDeliveryMethod} → ${value}`);
+                                updateDeliveryMethod(orderId, value);
+                              }}
+                              disabled={updatingDelivery === orderId}
+                            >
+                              <SelectTrigger className="w-36">
+                                <SelectValue>
+                                  <div className="flex items-center gap-2">
+                                    {currentDeliveryMethod === 'delhivery' ? (
+                                      <>
+                                        <Package className="h-4 w-4" />
+                                        <span className="text-sm">Delhivery</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Truck className="h-4 w-4" />
+                                        <span className="text-sm">Manual</span>
+                                      </>
+                                    )}
+                                  </div>
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="manual">
+                                  <div className="flex items-center gap-2">
+                                    <Truck className="h-4 w-4" />
+                                    <span>Manual Delivery</span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="delhivery">
+                                  <div className="flex items-center gap-2">
+                                    <Package className="h-4 w-4" />
+                                    <span>Delhivery</span>
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          );
+                        })()}
+                        {updatingDelivery === orderId && (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        )}
+                        {order.shipping?.trackingNumber && (
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            <div>
+                              <span className="font-medium">Tracking:</span> {order.shipping.trackingNumber}
+                              {order.shipping.trackingNumber.startsWith('MOCK_') && (
+                                <span className="ml-1 text-orange-600">(Mock)</span>
+                              )}
+                            </div>
+                            {order.shipping.delhiveryStatus && (
+                              <div>
+                                <span className="font-medium">Status:</span> {order.shipping.delhiveryStatus}
+                              </div>
+                            )}
+                            {order.shipping.currentLocation && (
+                              <div>
+                                <span className="font-medium">Location:</span> {order.shipping.currentLocation}
+                              </div>
+                            )}
+                            {order.shipping.estimatedDelivery && (
+                              <div>
+                                <span className="font-medium">ETA:</span> {new Date(order.shipping.estimatedDelivery).toLocaleDateString()}
+                              </div>
+                            )}
+                            {order.shipping.lastTracked && (
+                              <div>
+                                <span className="font-medium">Last Updated:</span> {new Date(order.shipping.lastTracked).toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       {formatDate(orderDate)}
                     </TableCell>
                     <TableCell>
@@ -335,30 +580,66 @@ export default function OrdersPage() {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Select
-                          value={orderStatus}
-                          onValueChange={(value) => updateOrderStatus(orderId, value)}
-                          disabled={updating === orderId}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="confirmed">Confirmed</SelectItem>
-                            <SelectItem value="processing">Processing</SelectItem>
-                            <SelectItem value="shipped">Shipped</SelectItem>
-                            <SelectItem value="delivered">Delivered</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
-                          </SelectContent>
-                        </Select>
+
+                        {/* Manual Delivery: Show status dropdown for manual control */}
+                        {(!order.shipping?.deliveryMethod || order.shipping?.deliveryMethod === 'manual') && (
+                          <Select
+                            value={orderStatus}
+                            onValueChange={(value) => updateOrderStatus(orderId, value)}
+                            disabled={updating === orderId}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">Pending</SelectItem>
+                              <SelectItem value="confirmed">Confirmed</SelectItem>
+                              <SelectItem value="processing">Processing</SelectItem>
+                              <SelectItem value="shipped">Shipped</SelectItem>
+                              <SelectItem value="delivered">Delivered</SelectItem>
+                              <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+
+                        {/* Delhivery: Show sync and track buttons */}
+                        {order.shipping?.deliveryMethod === 'delhivery' && (
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                              Auto-updating via Delhivery
+                            </Badge>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              title="Sync Status from Delhivery"
+                              onClick={() => syncDelhiveryStatus(orderId)}
+                              disabled={syncingDelhivery === orderId}
+                            >
+                              {syncingDelhivery === orderId ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Package className="w-4 h-4" />
+                              )}
+                            </Button>
+                            {order.shipping?.trackingNumber && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                title="Track Shipment"
+                                onClick={() => window.open(`https://www.delhivery.com/track/package/${order.shipping?.trackingNumber}`, '_blank')}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
                 );
               }).filter(Boolean) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={8} className="text-center py-8">
                     <div className="flex flex-col items-center">
                       <Package className="h-12 w-12 text-muted-foreground mb-2" />
                       <p className="text-muted-foreground">No orders found</p>
@@ -397,7 +678,14 @@ export default function OrdersPage() {
           )}
         </CardContent>
       </Card>
-      </div>
+            </>
+          )}
+
+          {/* Delivery Management Tab */}
+          {activeTab === 'delivery' && (
+            <DeliveryManagement />
+          )}
+        </div>
 
       {/* Order Bill Modal */}
       <OrderBillModal
