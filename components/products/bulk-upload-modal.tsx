@@ -224,15 +224,6 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess }: BulkUploadModalP
               📸 How to Handle Product Images
             </h3>
             <div className="space-y-3 text-sm text-blue-800">
-              <div className="bg-white p-3 rounded border">
-                <h4 className="font-medium mb-2">🔄 Step-by-Step Image Upload Process:</h4>
-                <ol className="list-decimal list-inside space-y-1 text-xs">
-                  <li><strong>Upload Images First:</strong> Go to any existing product → Edit → Upload images to get Contabo S3 links</li>
-                  <li><strong>Copy the Links:</strong> After upload, copy the generated S3 URLs (they look like: https://your-bucket.contabo.com/...)</li>
-                  <li><strong>Use in CSV:</strong> Paste these links in the 'images' column, separated by commas for multiple images</li>
-                  <li><strong>Alternative:</strong> Use any publicly accessible image URLs (must be HTTPS)</li>
-                </ol>
-              </div>
 
               <div className="bg-white p-3 rounded border">
                 <h4 className="font-medium mb-2">✅ Accepted Image Formats:</h4>

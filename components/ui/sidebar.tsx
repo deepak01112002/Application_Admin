@@ -30,7 +30,9 @@ import {
   Truck,
   Building,
   Receipt,
-  Scan
+  Scan,
+  Share2,
+  Smartphone
 } from "lucide-react";
 import { useState } from "react";
 
@@ -155,6 +157,22 @@ const sidebarItems = [
     badge: null,
     color: "text-pink-600",
     bgColor: "bg-pink-50",
+  },
+  {
+    title: "Social Media",
+    icon: Share2,
+    page: "social-media",
+    badge: null,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
+  },
+  {
+    title: "App Settings",
+    icon: Smartphone,
+    page: "app-settings",
+    badge: null,
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
   },
   {
     title: "Settings",

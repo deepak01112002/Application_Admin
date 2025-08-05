@@ -362,6 +362,53 @@ export const orderService = {
   async updateOrderStatus(id: string, status: Order['status']): Promise<Order> {
     const response = await api.patch(`/orders/admin/${id}/status`, { status });
     return extractData(response);
+  },
+
+  // Delivery Management Methods
+  async getDeliveryOptions(): Promise<any> {
+    const response = await api.get('/admin-delivery/options');
+    return extractData(response);
+  },
+
+  async updateOrderDeliveryMethod(orderId: string, deliveryMethod: string, adminNotes?: string): Promise<any> {
+    const response = await api.put(`/admin-delivery/update-method/${orderId}`, {
+      deliveryMethod,
+      adminNotes: adminNotes || 'Updated via admin panel'
+    });
+    return extractData(response);
+  },
+
+  async getOrdersByDeliveryMethod(params?: { deliveryMethod?: string; status?: string; page?: number; limit?: number }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params?.deliveryMethod) queryParams.append('deliveryMethod', params.deliveryMethod);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+    const query = queryParams.toString();
+    const response = await api.get(`/admin-delivery/orders${query ? `?${query}` : ''}`);
+    return extractData(response);
+  },
+
+  async getPendingDeliveryAssignments(params?: { page?: number; limit?: number }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+    const query = queryParams.toString();
+    const response = await api.get(`/admin-delivery/orders/pending${query ? `?${query}` : ''}`);
+    return extractData(response);
+  },
+
+  // Delhivery Status Sync Methods
+  async syncDelhiveryStatus(orderId: string): Promise<any> {
+    const response = await api.post(`/admin-delivery/orders/${orderId}/sync`);
+    return extractData(response);
+  },
+
+  async syncAllDelhiveryOrders(): Promise<any> {
+    const response = await api.post('/admin-delivery/sync-all-delhivery');
+    return extractData(response);
   }
 };
 
@@ -824,4 +871,124 @@ export const reportsService = {
     const response = await api.get(`/reports/financial${queryString ? `?${queryString}` : ''}`);
     return extractData(response);
   },
+};
+
+// Social Media Service
+export const socialMediaService = {
+  async getAllSocialMediaLinks(params?: any): Promise<any> {
+    const queryString = params ? new URLSearchParams(params).toString() : '';
+    const response = await api.get(`/social-media/admin/all${queryString ? `?${queryString}` : ''}`);
+    return extractData(response);
+  },
+
+  async getSocialMediaLink(id: string): Promise<any> {
+    const response = await api.get(`/social-media/admin/${id}`);
+    return extractData(response);
+  },
+
+  async createSocialMediaLink(data: any): Promise<any> {
+    const response = await api.post('/social-media/admin', data);
+    const result = extractData(response);
+    // Handle nested response structure
+    return result.socialMediaLink || result;
+  },
+
+  async updateSocialMediaLink(id: string, data: any): Promise<any> {
+    const response = await api.put(`/social-media/admin/${id}`, data);
+    return extractData(response);
+  },
+
+  async deleteSocialMediaLink(id: string): Promise<any> {
+    const response = await api.delete(`/social-media/admin/${id}`);
+    return extractData(response);
+  },
+
+  async bulkReorderSocialMedia(items: any[]): Promise<any> {
+    const response = await api.put('/social-media/admin/bulk/reorder', { items });
+    return extractData(response);
+  },
+
+  async getSocialMediaAnalytics(): Promise<any> {
+    const response = await api.get('/social-media/admin/analytics');
+    return extractData(response);
+  },
+
+  async getPublicSocialMediaLinks(params?: any): Promise<any> {
+    const queryString = params ? new URLSearchParams(params).toString() : '';
+    const response = await api.get(`/social-media${queryString ? `?${queryString}` : ''}`);
+    return extractData(response);
+  },
+
+  async trackSocialMediaClick(id: string): Promise<any> {
+    const response = await api.post(`/social-media/${id}/click`);
+    return extractData(response);
+  }
+};
+
+// App Settings Service
+export const appSettingsService = {
+  async getAppSettings(): Promise<any> {
+    const response = await api.get('/app-settings');
+    return extractData(response);
+  },
+
+  async getAppStatus(): Promise<any> {
+    const response = await api.get('/app-settings/status');
+    return extractData(response);
+  },
+
+  async getAllAppSettings(): Promise<any> {
+    const response = await api.get('/app-settings/admin');
+    return extractData(response);
+  },
+
+  async updateAppSettings(data: any): Promise<any> {
+    const response = await api.put('/app-settings/admin', data);
+    return extractData(response);
+  },
+
+  async toggleApplicationStatus(isActive: boolean, reason?: string): Promise<any> {
+    const response = await api.put('/app-settings/admin/toggle-active', { isActive, reason });
+    return extractData(response);
+  },
+
+  async toggleMaintenanceMode(maintenanceMode: boolean, message?: string): Promise<any> {
+    const response = await api.put('/app-settings/admin/maintenance', { maintenanceMode, message });
+    return extractData(response);
+  },
+
+  async updateBusinessHours(businessHours: any): Promise<any> {
+    const response = await api.put('/app-settings/admin/business-hours', { businessHours });
+    return extractData(response);
+  },
+
+  async updateOrderSettings(orderSettings: any): Promise<any> {
+    const response = await api.put('/app-settings/admin/order-settings', { orderSettings });
+    return extractData(response);
+  },
+
+  async updateDeliverySettings(deliverySettings: any): Promise<any> {
+    const response = await api.put('/app-settings/admin/delivery-settings', { deliverySettings });
+    return extractData(response);
+  },
+
+  async updateContactInfo(contactInfo: any): Promise<any> {
+    const response = await api.put('/app-settings/admin/contact-info', { contactInfo });
+    return extractData(response);
+  },
+
+  async updateAppVersion(appVersion: any): Promise<any> {
+    const response = await api.put('/app-settings/admin/app-version', { appVersion });
+    return extractData(response);
+  },
+
+  async updateFeatures(features: any): Promise<any> {
+    const response = await api.put('/app-settings/admin/features', { features });
+    return extractData(response);
+  },
+
+  async resetAppSettings(section: string): Promise<any> {
+    const response = await api.post('/app-settings/admin/reset', { section });
+    return extractData(response);
+  }
 };
