@@ -243,7 +243,7 @@ export function Sidebar({ className, currentPage, onNavigate, onLogout, currentU
                   setOpen(false);
                 }}
                 className={cn(
-                  "w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-all duration-200 group",
+                  "w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-all duration-200 group webview-button webview-text",
                   isActive
                     ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25"
                     : "text-slate-700 hover:bg-white hover:shadow-md hover:shadow-slate-200/50 hover:border-slate-200"

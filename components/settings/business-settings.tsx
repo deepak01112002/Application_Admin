@@ -121,14 +121,14 @@ export function BusinessSettings() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Business Settings</h1>
-        <p className="text-muted-foreground">Configure your business settings and preferences.</p>
+    <div className="space-y-4 sm:space-y-6 webview-optimized">
+      <div className="px-4 sm:px-0">
+        <h1 className="text-2xl sm:text-3xl font-bold webview-text">Business Settings</h1>
+        <p className="text-muted-foreground webview-text">Configure your business settings and preferences.</p>
       </div>
 
-      <Tabs defaultValue="company" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7">
+      <Tabs defaultValue="company" className="space-y-4 webview-scroll">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 webview-tabs overflow-x-auto">
           <TabsTrigger value="company" className="flex items-center gap-2">
             <Building className="h-4 w-4" />
             Company

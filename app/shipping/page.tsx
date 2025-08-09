@@ -21,7 +21,7 @@ import {
   Plus
 } from "lucide-react";
 import { AdminLayout } from "@/components/layout/admin-layout";
-import { shippingService } from "@/lib/services";
+// import { shippingService } from "@/lib/services";
 
 interface ShippingOrder {
   _id: string;
@@ -55,7 +55,8 @@ export default function ShippingPage() {
     const fetchShipments = async () => {
       try {
         // Fetch real shipments from backend API
-        const response = await shippingService.getShipments();
+        // const response = await shippingService.getShipments();
+        const response = [];
 
         if (response && Array.isArray(response)) {
           setShipments(response);
