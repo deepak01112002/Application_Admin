@@ -5,8 +5,10 @@ import { AdminLayout } from "@/components/layout/admin-layout";
 
 export default function SettingsPage() {
   return (
-    <div className="container mx-auto py-6">
-      <BusinessSettings />
+    <AdminLayout currentPage="settings">
+      <div className="webview-optimized webview-scroll">
+        <BusinessSettings />
       </div>
+    </AdminLayout>
   );
 }

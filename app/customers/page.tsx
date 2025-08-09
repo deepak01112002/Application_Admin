@@ -128,7 +128,7 @@ export default function CustomersPage() {
 
     try {
       const updatePromises = selectedCustomers.map(customerId =>
-        adminManagementService.toggleCustomerStatus(customerId)
+        adminManagementService.updateUserStatus(customerId, { isActive: true })
       );
 
       await Promise.all(updatePromises);
@@ -203,7 +203,7 @@ export default function CustomersPage() {
               {customers.filter(c => (c.wallet?.balance || 0) > 10000).length}
             </div>
             <p className="text-xs text-muted-foreground">
-              Wallet balance > ₹10,000
+              Wallet balance &gt; ₹10,000
             </p>
           </CardContent>
         </Card>

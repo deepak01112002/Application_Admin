@@ -45,10 +45,10 @@ export default function CouponsPage() {
       // Ensure we have an array
       if (Array.isArray(response)) {
         filteredCoupons = response;
-      } else if (response && Array.isArray(response.coupons)) {
-        filteredCoupons = response.coupons;
-      } else if (response && Array.isArray(response.data)) {
-        filteredCoupons = response.data;
+      } else if (response && typeof response === 'object' && 'coupons' in response && Array.isArray((response as any).coupons)) {
+        filteredCoupons = (response as any).coupons;
+      } else if (response && typeof response === 'object' && 'data' in response && Array.isArray((response as any).data)) {
+        filteredCoupons = (response as any).data;
       }
 
       if (searchTerm && filteredCoupons.length > 0) {

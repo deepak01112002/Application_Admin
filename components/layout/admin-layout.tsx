@@ -144,7 +144,7 @@ export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayout
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 webview-optimized webview-safe-area webview-no-scroll">
       {/* Fixed Sidebar */}
       <div className="hidden md:block w-80 flex-shrink-0">
         <Sidebar
@@ -167,11 +167,13 @@ export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayout
         />
       </div>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-gray-50 min-w-0">
-        <div className="p-6 max-w-none min-h-full">
-          <div className="max-w-7xl mx-auto">
-            {children}
+      {/* Main Content - Webview Optimized */}
+      <main className="flex-1 overflow-auto bg-gray-50 min-w-0 webview-scroll webview-container">
+        <div className="p-4 sm:p-6 max-w-none min-h-full webview-container">
+          <div className="max-w-7xl mx-auto webview-container">
+            <div className="webview-container">
+              {children}
+            </div>
           </div>
         </div>
       </main>

@@ -80,3 +80,124 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Webview Specific Optimizations */
+@layer utilities {
+  /* Prevent zoom on mobile webview */
+  .webview-optimized {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Better scrolling for webview */
+  .webview-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Responsive text that scales well in webview */
+  .webview-text {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    line-height: 1.5;
+  }
+
+  /* Responsive buttons for touch */
+  .webview-button {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Safe area handling for webview */
+  .webview-safe-area {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Responsive grid for different screen sizes */
+  .webview-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  /* Mobile-first responsive breakpoints */
+  @media (max-width: 640px) {
+    .webview-mobile-stack {
+      flex-direction: column !important;
+    }
+
+    .webview-mobile-full {
+      width: 100% !important;
+    }
+
+    .webview-mobile-hide {
+      display: none !important;
+    }
+  }
+
+  /* Tablet optimizations */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .webview-tablet-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
+  /* Desktop optimizations */
+  @media (min-width: 1025px) {
+    .webview-desktop-grid {
+      grid-template-columns: repeat(3, 1fr) !important;
+    }
+  }
+
+  /* Fix horizontal scroll issues */
+  .webview-no-scroll {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  /* Responsive containers */
+  .webview-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  /* Responsive tables */
+  .webview-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fix tab overflow */
+  .webview-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .webview-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Responsive forms */
+  .webview-form {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .webview-form input,
+  .webview-form select,
+  .webview-form textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}

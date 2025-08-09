@@ -1,0 +1,119 @@
+{
+  "name": "Ghanshyam Murti Bhandar Admin Panel",
+  "version": "1.0.0",
+  "description": "Complete responsive admin dashboard for webview integration",
+  "webview": {
+    "optimized": true,
+    "responsive": true,
+    "touchFriendly": true,
+    "safeArea": true
+  },
+  "features": {
+    "dashboard": {
+      "enabled": true,
+      "responsive": true,
+      "realTimeData": true
+    },
+    "productManagement": {
+      "enabled": true,
+      "crud": true,
+      "imageUpload": true,
+      "bulkOperations": true
+    },
+    "orderManagement": {
+      "enabled": true,
+      "statusUpdates": true,
+      "invoiceGeneration": true,
+      "tracking": true
+    },
+    "customerManagement": {
+      "enabled": true,
+      "profiles": true,
+      "analytics": true
+    },
+    "inventory": {
+      "enabled": true,
+      "stockManagement": true,
+      "lowStockAlerts": true
+    },
+    "reports": {
+      "enabled": true,
+      "salesReports": true,
+      "analytics": true,
+      "exports": true
+    },
+    "settings": {
+      "enabled": true,
+      "appControl": true,
+      "socialMedia": true,
+      "businessSettings": true
+    }
+  },
+  "responsive": {
+    "breakpoints": {
+      "mobile": "640px",
+      "tablet": "1024px",
+      "desktop": "1280px"
+    },
+    "grid": {
+      "mobile": 1,
+      "tablet": 2,
+      "desktop": 3
+    },
+    "navigation": {
+      "mobile": "drawer",
+      "tablet": "sidebar",
+      "desktop": "sidebar"
+    }
+  },
+  "webviewSettings": {
+    "viewport": {
+      "width": "device-width",
+      "initialScale": 1,
+      "maximumScale": 1,
+      "userScalable": false
+    },
+    "meta": {
+      "appleWebAppCapable": true,
+      "appleWebAppStatusBarStyle": "default",
+      "themeColor": "#3b82f6",
+      "formatDetection": "telephone=no"
+    },
+    "performance": {
+      "preloadCriticalResources": true,
+      "lazyLoadImages": true,
+      "optimizeScrolling": true
+    }
+  },
+  "integration": {
+    "backend": {
+      "baseUrl": "http://localhost:8080",
+      "apiVersion": "v1",
+      "authentication": "JWT"
+    },
+    "realTimeUpdates": {
+      "enabled": true,
+      "websockets": false,
+      "polling": true,
+      "interval": 30000
+    }
+  },
+  "urls": {
+    "development": "http://localhost:3001",
+    "production": "https://admin.ghanshyammurtibhandar.com",
+    "webview": {
+      "login": "/",
+      "dashboard": "/",
+      "products": "/products",
+      "orders": "/orders",
+      "customers": "/customers",
+      "settings": "/settings"
+    }
+  },
+  "build": {
+    "static": true,
+    "outputDir": "out",
+    "optimized": true,
+    "webviewReady": true
+  }
+}
