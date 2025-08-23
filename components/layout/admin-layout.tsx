@@ -94,6 +94,9 @@ export function AdminLayout({ children, currentPage = "dashboard" }: AdminLayout
       case "shipping":
         router.push("/shipping");
         break;
+      case "delivery-management":
+        router.push("/delivery-management");
+        break;
       case "reports":
         router.push("/reports");
         break;

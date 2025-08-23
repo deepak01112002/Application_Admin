@@ -119,6 +119,14 @@ const sidebarItems = [
     bgColor: "bg-emerald-50",
   },
   {
+    title: "Estimates",
+    icon: FileText,
+    page: "estimates",
+    badge: "New",
+    color: "text-indigo-600",
+    bgColor: "bg-indigo-50",
+  },
+  {
     title: "Returns",
     icon: RotateCcw,
     page: "returns",
@@ -141,6 +149,14 @@ const sidebarItems = [
     badge: null,
     color: "text-teal-600",
     bgColor: "bg-teal-50",
+  },
+  {
+    title: "Delivery Management",
+    icon: Truck,
+    page: "delivery-management",
+    badge: "New",
+    color: "text-orange-600",
+    bgColor: "bg-orange-50",
   },
   {
     title: "Reports",
