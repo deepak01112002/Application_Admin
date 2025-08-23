@@ -24,10 +24,29 @@ interface Order {
     email?: string;
   } | null;
   items?: Array<{
-    product?: string;
-    name?: string;
+    _id?: string;
+    product?: {
+      _id?: string;
+      id?: string;
+      name?: string;
+    };
     quantity?: number;
+    price?: number;
     unitPrice?: number;
+    totalPrice?: number;
+    subtotal?: number;
+    variant?: string;
+    // GST fields for bill generation
+    taxRate?: number;
+    tax?: number;
+    productSnapshot?: {
+      name?: string;
+      description?: string;
+      images?: string[];
+      category?: string;
+      gstRate?: number;
+      hsnCode?: string;
+    };
   }>;
   pricing?: {
     subtotal?: number;

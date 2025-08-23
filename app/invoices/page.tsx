@@ -86,6 +86,35 @@ export default function InvoicesPage() {
     console.log("Logout clicked");
   };
 
+  // Download invoice function
+  const downloadInvoice = async (invoiceId: string, format: string = 'A4') => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoices/${invoiceId}/download?format=${format}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Invoice-${format}-${invoiceId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        console.log(`Invoice downloaded in ${format} format`);
+      } else {
+        throw new Error('Download failed');
+      }
+    } catch (error) {
+      console.error('Error downloading invoice:', error);
+      alert('Failed to download invoice');
+    }
+  };
+
   // Sample data - Replace with API call
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -361,9 +390,21 @@ export default function InvoicesPage() {
                         <Button variant="outline" size="sm" title="View Invoice">
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm" title="Download PDF">
-                          <Download className="h-4 w-4" />
-                        </Button>
+                        {/* Download Dropdown */}
+                        <select
+                          className="px-2 py-1 border rounded text-sm"
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              downloadInvoice(invoice._id, e.target.value);
+                              e.target.value = ''; // Reset selection
+                            }
+                          }}
+                        >
+                          <option value="">Download</option>
+                          <option value="A4">Standard PDF</option>
+                          <option value="thermal">Thermal Print</option>
+                          <option value="4x6">4x6 Format</option>
+                        </select>
                         <Button variant="outline" size="sm" title="Edit Invoice">
                           <Edit className="h-4 w-4" />
                         </Button>

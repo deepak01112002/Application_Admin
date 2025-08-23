@@ -47,6 +47,10 @@ export interface Product {
   is_featured: boolean;
   rating: number;
   review_count: number;
+  // GST & Tax fields
+  gstRate?: number;
+  hsnCode?: string;
+  taxCategory?: 'taxable' | 'exempt' | 'zero_rated';
   specifications?: {
     material?: string;
     height?: string;

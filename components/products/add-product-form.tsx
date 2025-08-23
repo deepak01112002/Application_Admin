@@ -30,6 +30,10 @@ export function AddProductForm({ onClose, onProductAdded }: AddProductFormProps)
     originalPrice: "",
     stock: "",
     isActive: true,
+    // GST & Tax fields
+    gstRate: "18",
+    hsnCode: "9999",
+    taxCategory: "taxable",
     // Specifications
     material: "",
     height: "",
@@ -76,6 +80,11 @@ export function AddProductForm({ onClose, onProductAdded }: AddProductFormProps)
       formDataToSend.append('originalPrice', formData.originalPrice);
       formDataToSend.append('stock', formData.stock);
       formDataToSend.append('isActive', formData.isActive.toString());
+
+      // GST & Tax fields
+      formDataToSend.append('gstRate', formData.gstRate);
+      formDataToSend.append('hsnCode', formData.hsnCode);
+      formDataToSend.append('taxCategory', formData.taxCategory);
 
       // Specifications
       formDataToSend.append('material', formData.material);
@@ -258,6 +267,43 @@ export function AddProductForm({ onClose, onProductAdded }: AddProductFormProps)
                 />
                 <Label htmlFor="isActive">Product is active</Label>
               </div>
+            </div>
+          </div>
+
+          {/* GST & Tax Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="gstRate">GST Rate (%)</Label>
+              <Input
+                id="gstRate"
+                type="number"
+                step="0.01"
+                value={formData.gstRate}
+                onChange={(e) => handleInputChange("gstRate", e.target.value)}
+                placeholder="e.g., 18"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="hsnCode">HSN Code</Label>
+              <Input
+                id="hsnCode"
+                value={formData.hsnCode}
+                onChange={(e) => handleInputChange("hsnCode", e.target.value)}
+                placeholder="e.g., 9999"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="taxCategory">Tax Category</Label>
+              <Select value={formData.taxCategory} onValueChange={(value) => handleInputChange("taxCategory", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select tax category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="taxable">Taxable</SelectItem>
+                  <SelectItem value="exempt">Exempt</SelectItem>
+                  <SelectItem value="nil">Nil</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

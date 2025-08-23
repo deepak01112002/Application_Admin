@@ -26,6 +26,10 @@ export function EditProductForm({ product, onClose, onProductUpdated }: EditProd
     stock: product.stock.toString(),
     isActive: product.is_active,
     isFeatured: product.is_featured || false,
+    // GST & Tax fields
+    gstRate: (product.gstRate || 18).toString(),
+    hsnCode: product.hsnCode || '9999',
+    taxCategory: product.taxCategory || 'taxable',
     // Specifications
     material: product.specifications?.material || '',
     height: product.specifications?.height || '',
@@ -75,6 +79,11 @@ export function EditProductForm({ product, onClose, onProductUpdated }: EditProd
       formDataToSend.append('stock', formData.stock);
       formDataToSend.append('isActive', formData.isActive.toString());
       formDataToSend.append('isFeatured', formData.isFeatured.toString());
+
+      // GST & Tax fields
+      formDataToSend.append('gstRate', formData.gstRate);
+      formDataToSend.append('hsnCode', formData.hsnCode);
+      formDataToSend.append('taxCategory', formData.taxCategory);
 
       // Specifications
       formDataToSend.append('material', formData.material);
@@ -238,6 +247,46 @@ export function EditProductForm({ product, onClose, onProductUpdated }: EditProd
                   required
                   placeholder="0"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* GST & Tax Fields */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">GST & Tax Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="gstRate">GST Rate (%)</Label>
+                <Input
+                  id="gstRate"
+                  type="number"
+                  step="0.01"
+                  value={formData.gstRate}
+                  onChange={(e) => handleInputChange("gstRate", e.target.value)}
+                  placeholder="18.00"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hsnCode">HSN Code</Label>
+                <Input
+                  id="hsnCode"
+                  value={formData.hsnCode}
+                  onChange={(e) => handleInputChange("hsnCode", e.target.value)}
+                  placeholder="e.g., 9999"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="taxCategory">Tax Category</Label>
+                <select
+                  id="taxCategory"
+                  value={formData.taxCategory}
+                  onChange={(e) => handleInputChange("taxCategory", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="taxable">Taxable</option>
+                  <option value="exempt">Exempt</option>
+                  <option value="non-gst">Non-GST</option>
+                </select>
               </div>
             </div>
           </div>
