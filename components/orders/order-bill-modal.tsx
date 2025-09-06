@@ -577,8 +577,8 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
                 margin: 0 !important;
                 padding: 0 !important;
                 overflow: hidden !important;
-                font-size: 4px !important;
-                line-height: 0.9 !important;
+                font-size: 8px !important;
+                line-height: 1.2 !important;
                 max-height: 6in !important;
                 min-height: 6in !important;
                 box-sizing: border-box !important;
@@ -631,6 +631,287 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
       }
     } else {
       alert('Thermal content not found.');
+    }
+  };
+
+  const handleGstBill = () => {
+    console.log('GST Bill clicked');
+    console.log('Order:', order);
+    
+    // Prompt for customer GST number
+    const customerGstNumber = prompt('Enter Customer GST Number (15 characters):');
+    if (!customerGstNumber) {
+      return;
+    }
+    
+    // Validate GST number format (basic validation)
+    if (customerGstNumber.length !== 15) {
+      alert('GST number must be 15 characters long');
+      return;
+    }
+    
+    // Create a professional GST bill with accurate data
+    const gstBillWindow = window.open('', '_blank');
+    if (gstBillWindow) {
+      gstBillWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>GST Tax Invoice - ${order?.orderNumber || order?._id}</title>
+          <style>
+            @page { size: A4; margin: 0.5in; }
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-size: 12px;
+              line-height: 1.4;
+              margin: 0;
+              padding: 20px;
+              background: white;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 2px solid #333;
+              padding-bottom: 20px;
+            }
+            .company-name {
+              font-size: 24px;
+              font-weight: bold;
+              margin-bottom: 10px;
+              color: #333;
+            }
+            .gst-bill-title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #28a745;
+              margin-bottom: 5px;
+            }
+            .grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 30px;
+              margin-bottom: 30px;
+            }
+            .font-bold { font-weight: bold; }
+            .mb-2 { margin-bottom: 8px; }
+            .mb-4 { margin-bottom: 16px; }
+            .text-center { text-align: center; }
+            .text-right { text-align: right; }
+            .border { border: 1px solid #d1d5db; }
+            .p-2 { padding: 8px; }
+            .p-4 { padding: 16px; }
+            .bg-gray-50 { background-color: #f9f9fa; }
+            .items-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 30px;
+            }
+            .items-table th {
+              background: #f8f9fa;
+              border: 1px solid #333;
+              padding: 12px 8px;
+              text-align: left;
+              font-weight: bold;
+              font-size: 12px;
+            }
+            .items-table td {
+              border: 1px solid #333;
+              padding: 12px 8px;
+              font-size: 11px;
+            }
+            .total-section {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 30px;
+            }
+            .total-table {
+              width: 300px;
+              margin-left: auto;
+            }
+            .total-table td {
+              border: 1px solid #333;
+              padding: 8px 12px;
+              font-size: 12px;
+            }
+            .total-table .label {
+              font-weight: bold;
+              background: #f8f9fa;
+              width: 60%;
+            }
+            .gst-highlight {
+              background-color: #e8f5e8;
+              border: 2px solid #28a745;
+              padding: 10px;
+              margin: 10px 0;
+              border-radius: 5px;
+            }
+            .action-buttons {
+              text-align: center;
+              margin: 30px 0;
+            }
+            .btn {
+              background: #28a745;
+              color: white;
+              border: none;
+              padding: 12px 25px;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 16px;
+              margin: 0 10px;
+              text-decoration: none;
+              display: inline-block;
+            }
+            .btn:hover {
+              background: #1e7e34;
+            }
+            @media print {
+              .no-print { display: none !important; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="company-name">GHANSHYAM MURTI BHANDAR</div>
+            <div class="gst-bill-title">GST TAX INVOICE</div>
+            <div style="font-size: 14px;">(Original for Recipient)</div>
+          </div>
+
+          <div class="grid">
+            <div>
+              <div class="font-bold mb-2">Sold By:</div>
+              <div class="font-bold">GHANSHYAM MURTI BHANDAR</div>
+              <div>CANAL ROAD vasudhra soc, block no 193, near</div>
+              <div>jilla garden cancal road</div>
+              <div>Rajkot, GUJARAT, 360002</div>
+              <div>GSTIN: 24BYAPD0171N1ZP</div>
+              <div>PAN: BYAPD0171N</div>
+            </div>
+            <div>
+              <div class="font-bold mb-2">Bill To:</div>
+              <div class="font-bold">${customerName}</div>
+              <div>${shippingAddress}</div>
+              <div>GSTIN: ${customerGstNumber}</div>
+              <div>Phone: ${customerPhone}</div>
+            </div>
+          </div>
+
+          <div class="gst-highlight">
+            <div class="font-bold text-center">GST BILL DETAILS</div>
+            <div style="text-align: center; margin-top: 5px;">
+              Invoice No: INV-${(order?.orderNumber || order?._id || '').slice(-6)} | 
+              Date: ${formatDate(order?.createdAt || Date.now().toString())}
+            </div>
+          </div>
+
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Sl.</th>
+                <th>Description</th>
+                <th>HSN Code</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Taxable Value</th>
+                <th>CGST</th>
+                <th>SGST</th>
+                <th>IGST</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${order?.items?.map((item: any, index: number) => {
+                const itemTotal = calculateItemTotal(item);
+                const gstRate = item.taxRate || item.productSnapshot?.gstRate || item.product?.gstRate || 18;
+                const itemTax = item.tax || (itemTotal * (gstRate / 100));
+                const taxableValue = itemTotal;
+                const cgst = itemTax / 2; // Assuming intra-state
+                const sgst = itemTax / 2; // Assuming intra-state
+                const igst = 0; // Intra-state
+                const total = itemTotal + itemTax;
+                
+                return `
+                  <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.productSnapshot?.name || item.product?.name || item.name || 'Product'}</td>
+                    <td>${item.productSnapshot?.hsnCode || '9999'}</td>
+                    <td>${item.quantity || 1}</td>
+                    <td>₹${(item.price || item.unitPrice || 0).toFixed(2)}</td>
+                    <td>₹${taxableValue.toFixed(2)}</td>
+                    <td>₹${cgst.toFixed(2)}</td>
+                    <td>₹${sgst.toFixed(2)}</td>
+                    <td>₹${igst.toFixed(2)}</td>
+                    <td>₹${total.toFixed(2)}</td>
+                  </tr>
+                `;
+              }).join('') || `
+                <tr>
+                  <td>1</td>
+                  <td>Product/Service</td>
+                  <td>9999</td>
+                  <td>1</td>
+                  <td>₹0.00</td>
+                  <td>₹0.00</td>
+                  <td>₹0.00</td>
+                  <td>₹0.00</td>
+                  <td>₹0.00</td>
+                  <td>₹0.00</td>
+                </tr>
+              `}
+            </tbody>
+          </table>
+
+          <div class="total-section">
+            <div></div>
+            <div class="total-table">
+              <table>
+                <tr>
+                  <td class="label">Sub Total:</td>
+                  <td>₹${subtotal.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td class="label">CGST:</td>
+                  <td>₹${(tax / 2).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td class="label">SGST:</td>
+                  <td>₹${(tax / 2).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td class="label">IGST:</td>
+                  <td>₹0.00</td>
+                </tr>
+                <tr>
+                  <td class="label">Total GST:</td>
+                  <td>₹${tax.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td class="label">Shipping:</td>
+                  <td>₹${shipping.toFixed(2)}</td>
+                </tr>
+                <tr style="background: #f8f9fa; font-weight: bold;">
+                  <td class="label">Grand Total:</td>
+                  <td>₹${total.toFixed(2)}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <div style="margin-top: 40px; text-align: center;">
+            <div style="font-weight: bold; margin-bottom: 20px;">For GHANSHYAM MURTI BHANDAR</div>
+            <div style="border-top: 1px solid #333; padding-top: 10px;">Authorized Signatory</div>
+          </div>
+
+          <div class="action-buttons no-print">
+            <button class="btn" onclick="window.print()">🖨️ Print GST Bill</button>
+            <button class="btn" onclick="window.close()" style="background: #6c757d;">❌ Close</button>
+          </div>
+        </body>
+        </html>
+      `);
+      gstBillWindow.document.close();
+    } else {
+      alert('Failed to open GST bill window. Please check popup blockers.');
     }
   };
 
@@ -851,7 +1132,7 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
               </div>
               <div class="detail-row">
                 <span class="detail-label">CUSTOMER</span>
-                <span class="detail-value">${order?.customer?.name || order?.customerName || 'Customer Name'}</span>
+                <span class="detail-value">${customerName}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">PROJECT</span>
@@ -873,11 +1154,11 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
             </div>
             <div class="bill-to">
               <h3>BILL TO</h3>
-              <p>${order?.customer?.name || order?.customerName || 'Customer Name'}</p>
-              <p>${order?.shippingAddress?.addressLine1 || order?.shippingAddress?.address || 'Customer Address'}</p>
-              <p>${order?.shippingAddress?.city || 'City'}, ${order?.shippingAddress?.state || 'State'} ${order?.shippingAddress?.postalCode || order?.shippingAddress?.pincode || 'Zip'}</p>
-              <p>${order?.customer?.phone || order?.customerPhone || 'Phone Number'}</p>
-              <p>${order?.customer?.email || order?.customerEmail || 'Email'}</p>
+              <p>${customerName}</p>
+              <p>${shippingAddress}</p>
+              <p>${shippingCity}, ${shippingState} ${shippingPincode}</p>
+              <p>${customerPhone}</p>
+              <p>${customerEmail}</p>
             </div>
           </div>
           
@@ -893,18 +1174,13 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
             <tbody>
               ${order?.items?.map((item: any) => {
                 // Use the same calculation logic as the main bill
-                const itemTotal = item.totalPrice ||
-                                 (item.unitPrice * item.quantity) ||
-                                 (item.price * item.quantity) ||
-                                 item.total ||
-                                 item.subtotal ||
-                                 0;
+                const itemTotal = calculateItemTotal(item);
                 
                 return `
                   <tr>
                     <td>${item.quantity || 1}</td>
-                    <td>${item.productSnapshot?.name || item.product?.name || item.name || item.productName || 'Product Name'}</td>
-                    <td>₹${item.unitPrice || item.price || item.amount || '0'}</td>
+                    <td>${item.productSnapshot?.name || item.product?.name || item.name || 'Product Name'}</td>
+                    <td>₹${(item.unitPrice || item.price || 0).toFixed(2)}</td>
                     <td>₹${itemTotal.toFixed(2)}</td>
                   </tr>
                 `;
@@ -912,8 +1188,8 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
                 <tr>
                   <td>1</td>
                   <td>Product/Service Description</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
+                  <td>₹0.00</td>
+                  <td>₹0.00</td>
                 </tr>
               `}
               ${Array.from({length: 8}, () => `
@@ -1538,6 +1814,11 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
               Estimate Bill
             </Button>
             
+            <Button onClick={handleGstBill} variant="default" className="bg-green-600 hover:bg-green-700">
+              <Download className="h-4 w-4 mr-2" />
+              GST Bill
+            </Button>
+            
             <Button onClick={downloadBill} variant="outline">
               <Download className="h-4 w-4 mr-2" />
               Download A4
@@ -1789,78 +2070,79 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
           style={{ 
             width: '4in', 
             height: '6in', 
-            fontSize: '4px', 
-            lineHeight: '0.9', 
+            fontSize: '8px', 
+            lineHeight: '1.2', 
             overflow: 'hidden',
             pageBreakInside: 'avoid',
             breakInside: 'avoid',
             margin: '0',
-            padding: '0',
+            padding: '0.05in',
             position: 'relative',
             border: '1px solid #000',
             maxHeight: '6in',
-            minHeight: '6in'
+            minHeight: '6in',
+            boxSizing: 'border-box'
           }}
         >
           {/* Top Section: Customer Address (Left) + Delhivery (Right) */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.002in', height: '1.2in', margin: '0' }}>
             {/* Left: Customer Address */}
-            <div style={{ border: '1px solid #000', padding: '0.002in', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px', fontSize: '6px' }}>Customer Address</div>
-              <div style={{ fontWeight: 'bold', textTransform: 'lowercase', fontSize: '7px' }}>{customerName}</div>
-              <div style={{ whiteSpace: 'pre-line', fontSize: '5px', marginTop: '2px' }}>{shippingAddress}</div>
-              <div style={{ fontSize: '5px', marginTop: '2px' }}>{shippingCity}, {shippingState}, {shippingPincode}</div>
+            <div style={{ border: '1px solid #000', padding: '0.01in', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '3px', fontSize: '10px' }}>Customer Address</div>
+              <div style={{ fontWeight: 'bold', textTransform: 'lowercase', fontSize: '11px' }}>{customerName}</div>
+              <div style={{ whiteSpace: 'pre-line', fontSize: '9px', marginTop: '3px' }}>{shippingAddress}</div>
+              <div style={{ fontSize: '9px', marginTop: '3px' }}>{shippingCity}, {shippingState}, {shippingPincode}</div>
           </div>
 
             {/* Right: Delhivery block */}
-            <div style={{ border: '1px solid #000', padding: '0.002in', height: '100%', position: 'relative', boxSizing: 'border-box' }}>
+            <div style={{ border: '1px solid #000', padding: '0.01in', height: '100%', position: 'relative', boxSizing: 'border-box' }}>
               {/* COD banner */}
-              <div style={{ background: '#000', color: 'white', textAlign: 'center', height: '0.08in', lineHeight: '0.08in', fontWeight: 700, marginBottom: '0.002in', fontSize: '4px' }}>
+              <div style={{ background: '#000', color: 'white', textAlign: 'center', height: '0.1in', lineHeight: '0.1in', fontWeight: 700, marginBottom: '0.003in', fontSize: '8px' }}>
                 COD: Check the payable amount on
             </div>
-              <div style={{ fontWeight: 'bold', fontSize: '7px' }}>Delhivery</div>
-              <div style={{ display: 'inline-block', color: 'white', fontSize: '3px', padding: '1px 2px', marginTop: '2px', background: '#000', borderRadius: '1px' }}>Pickup</div>
-              <div style={{ fontSize: '3px', marginTop: '2px' }}>Destination Code</div>
-              <div style={{ fontSize: '3px', marginTop: '2px' }}>Return Code</div>
-              <div style={{ fontSize: '4px', fontWeight: 600 }}>360002,2155544</div>
+              <div style={{ fontWeight: 'bold', fontSize: '11px' }}>Delhivery</div>
+              <div style={{ display: 'inline-block', color: 'white', fontSize: '7px', padding: '2px 4px', marginTop: '3px', background: '#000', borderRadius: '2px' }}>Pickup</div>
+              <div style={{ fontSize: '7px', marginTop: '3px' }}>Destination Code</div>
+              <div style={{ fontSize: '7px', marginTop: '3px' }}>Return Code</div>
+              <div style={{ fontSize: '8px', fontWeight: 600 }}>360002,2155544</div>
             </div>
           </div>
 
           {/* Middle Section: Return Address (Left) + Codes/QR/Barcode (Right) */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.002in', marginTop: '0.002in', height: '1.2in' }}>
             {/* Left: Return Address */}
-            <div style={{ border: '1px solid #000', padding: '0.002in', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ fontSize: '4px', marginBottom: '2px' }}>If undelivered, return to:</div>
-              <div style={{ fontWeight: 'bold', fontSize: '5px' }}>GHANSHYAM MURATI BHANDAR</div>
-              <div style={{ whiteSpace: 'pre-line', fontSize: '3px' }}>SHREE VASHUNADHARA SOC. BLOCK NO
+            <div style={{ border: '1px solid #000', padding: '0.01in', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ fontSize: '8px', marginBottom: '3px' }}>If undelivered, return to:</div>
+              <div style={{ fontWeight: 'bold', fontSize: '9px' }}>GHANSHYAM MURATI BHANDAR</div>
+              <div style={{ whiteSpace: 'pre-line', fontSize: '7px' }}>SHREE VASHUNADHARA SOC. BLOCK NO
 193, CANCAL ROAD
 JILLA GARDEN
 rajkot, Gujarat, 360002</div>
           </div>
 
             {/* Right: Codes, QR, Barcode */}
-            <div style={{ border: '1px solid #000', padding: '0.002in', height: '100%', boxSizing: 'border-box' }}>
+            <div style={{ border: '1px solid #000', padding: '0.01in', height: '100%', boxSizing: 'border-box' }}>
               {/* QR Code */}
-              <div style={{ marginTop: '2px', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ marginTop: '3px', display: 'flex', justifyContent: 'center' }}>
                 {qrCodeUrl ? (
-                  <img src={qrCodeUrl} alt="QR" style={{ width: '0.3in', height: '0.3in' }} />
+                  <img src={qrCodeUrl} alt="QR" style={{ width: '0.4in', height: '0.4in' }} />
                 ) : (
-                  <div style={{ width: '0.3in', height: '0.3in', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <QrCode className="h-2 w-2 text-gray-400" />
+                  <div style={{ width: '0.4in', height: '0.4in', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <QrCode className="h-3 w-3 text-gray-400" />
               </div>
             )}
             </div>
               
               {/* Order Number */}
-              <div style={{ textAlign: 'center', fontWeight: 600, fontSize: '5px', marginTop: '2px' }}>
+              <div style={{ textAlign: 'center', fontWeight: 600, fontSize: '9px', marginTop: '3px' }}>
                 {(order.orderNumber || order._id) as string}
           </div>
 
               {/* Barcode */}
-              <div style={{ marginTop: '2px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ marginTop: '3px', width: '100%', display: 'flex', justifyContent: 'center' }}>
                 <img
                   alt="barcode"
-                  style={{ width: '100%', height: '0.15in', objectFit: 'contain' }}
+                  style={{ width: '100%', height: '0.2in', objectFit: 'contain' }}
                   src={`https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(
                     (order.orderNumber || order._id || '').toString()
                   )}&code=Code128&dpi=96`}
@@ -1869,85 +2151,7 @@ rajkot, Gujarat, 360002</div>
               </div>
           </div>
 
-          {/* Bottom Section: Product Details with Items Table */}
-          <div style={{ border: '1px solid #000', marginTop: '0.002in', height: '3.6in', padding: '0.002in', boxSizing: 'border-box' }}>
-            <div style={{ fontSize: '6px', fontWeight: 'bold', marginBottom: '2px', textAlign: 'center' }}>PRODUCT DETAILS & GST BREAKDOWN</div>
-            
-            {/* Items Table */}
-            <div style={{ marginBottom: '2px' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '4px' }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#f0f0f0' }}>
-                    <th style={{ border: '1px solid #000', padding: '1px', textAlign: 'center', fontWeight: 'bold' }}>Item</th>
-                    <th style={{ border: '1px solid #000', padding: '1px', textAlign: 'center', fontWeight: 'bold' }}>Qty</th>
-                    <th style={{ border: '1px solid #000', padding: '1px', textAlign: 'center', fontWeight: 'bold' }}>Price</th>
-                    <th style={{ border: '1px solid #000', padding: '1px', textAlign: 'center', fontWeight: 'bold' }}>GST%</th>
-                    <th style={{ border: '1px solid #000', padding: '1px', textAlign: 'center', fontWeight: 'bold' }}>Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {order.items?.map((item: any, index: number) => {
-                    const itemTotal = item.totalPrice || (item.price * item.quantity) || 0;
-                    // Prioritize stored tax rate from order item, then productSnapshot, then product, then default
-                    const gstRate = item.taxRate || item.productSnapshot?.gstRate || item.product?.gstRate || 18;
-                    // Use stored tax amount if available, otherwise calculate
-                    const itemTax = item.tax || (itemTotal * (gstRate / 100));
-                    const totalWithGST = itemTotal + itemTax;
-                    
-                    return (
-                      <tr key={index}>
-                        <td style={{ border: '1px solid #000', padding: '1px', fontSize: '3px', textAlign: 'left' }}>
-                          {item.productSnapshot?.name || item.name || 'Product'}
-                        </td>
-                        <td style={{ border: '1px solid #000', padding: '1px', textAlign: 'center' }}>{item.quantity || 1}</td>
-                        <td style={{ border: '1px solid #000', padding: '1px', textAlign: 'center' }}>₹{(item.price || item.unitPrice || 0).toFixed(2)}</td>
-                        <td style={{ border: '1px solid #000', padding: '1px', textAlign: 'center', fontWeight: 'bold' }}>{gstRate}%</td>
-                        <td style={{ border: '1px solid #000', padding: '1px', textAlign: 'center' }}>₹{totalWithGST.toFixed(2)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Order Summary */}
-            <div style={{ marginTop: '2px', fontSize: '4px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1px' }}>
-                <span style={{ fontWeight: 'bold' }}>Subtotal:</span>
-                <span>₹{subtotal.toFixed(2)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1px' }}>
-                <span style={{ fontWeight: 'bold' }}>GST Total:</span>
-                <span>₹{tax.toFixed(2)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1px' }}>
-                <span style={{ fontWeight: 'bold' }}>Shipping:</span>
-                <span>₹{shipping.toFixed(2)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1px', borderTop: '1px solid #000', paddingTop: '1px', fontWeight: 'bold' }}>
-                <span>GRAND TOTAL:</span>
-                <span>₹{total.toFixed(2)}</span>
-              </div>
-            </div>
-            
-            {/* Additional Info */}
-            <div style={{ marginTop: '2px', fontSize: '3px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 'bold' }}>HSN:</span>
-                <span>{order.items?.[0]?.productSnapshot?.hsnCode || '9999'}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1px' }}>
-                <span style={{ fontWeight: 'bold' }}>Order No.:</span>
-                <span>{(order.orderNumber || order._id) as string}</span>
-              </div>
-            </div>
-
-          {/* Footer */}
-            <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ flex: 1, textAlign: 'center', fontWeight: 600, fontSize: '6px' }}>TAX INVOICE</div>
-              <div style={{ fontSize: '3px', marginLeft: 'auto' }}>Original For Recipient</div>
-          </div>
-          </div>
+         
         </div>
 
         {/* Separate CSS to ensure thermal label fits exactly on 4x6 page */}
@@ -1994,7 +2198,7 @@ rajkot, Gujarat, 360002</div>
               width: 4in !important;
               height: 6in !important;
               margin: 0 !important;
-              padding: 0 !important;
+              padding: 0.05in !important;
               overflow: hidden !important;
               max-width: 4in !important;
               max-height: 6in !important;

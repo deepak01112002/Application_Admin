@@ -111,6 +111,8 @@ export default function OrdersPage() {
   const [syncingDelhivery, setSyncingDelhivery] = useState<string | null>(null);
   const [syncingAll, setSyncingAll] = useState(false);
   const [deliveryMethodOverrides, setDeliveryMethodOverrides] = useState<Record<string, string>>({});
+  const [gstNumbers, setGstNumbers] = useState<Record<string, string>>({});
+  const [generatingGstBill, setGeneratingGstBill] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -223,11 +225,11 @@ export default function OrdersPage() {
               ...order,
               shipping: {
                 ...order.shipping,
-                deliveryMethod: deliveryMethod,
+                deliveryMethod: deliveryMethod as 'manual' | 'delhivery',
                 carrier: deliveryMethod === 'delhivery' ? 'Delhivery' : 'Manual Delivery',
                 assignedAt: new Date().toISOString(),
                 adminNotes: 'Updated via admin panel',
-                trackingNumber: deliveryMethod === 'delhivery' ? `DHL${Date.now()}` : null
+                trackingNumber: deliveryMethod === 'delhivery' ? `DHL${Date.now()}` : undefined
               },
               updatedAt: new Date().toISOString()
             };
@@ -287,6 +289,304 @@ export default function OrdersPage() {
       console.error('Bulk sync error:', error);
     } finally {
       setSyncingAll(false);
+    }
+  };
+
+  const generateGstBill = async (orderId: string) => {
+    const gstNumber = gstNumbers[orderId];
+    if (!gstNumber) {
+      toast.error('Please enter customer GST number first');
+      return;
+    }
+
+    try {
+      setGeneratingGstBill(orderId);
+      
+      // Generate GST bill with customer GST number
+      const response = await fetch(`/api/invoices/generate/${orderId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerGstNumber: gstNumber,
+          billType: 'GST',
+          includeGstDetails: true
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate GST bill');
+      }
+
+      const invoice = await response.json();
+      
+      // Open the GST bill in a new window
+      const billWindow = window.open('', '_blank');
+      if (billWindow) {
+        billWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>GST Bill - ${invoice.invoiceNumber || orderId}</title>
+            <style>
+              @page { size: A4; margin: 0.5in; }
+              body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-size: 12px;
+                line-height: 1.4;
+                margin: 0;
+                padding: 20px;
+                background: white;
+                color: #333;
+              }
+              .header {
+                text-align: center;
+                margin-bottom: 30px;
+                border-bottom: 2px solid #333;
+                padding-bottom: 20px;
+              }
+              .company-name {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #333;
+              }
+              .gst-bill-title {
+                font-size: 18px;
+                font-weight: bold;
+                color: #28a745;
+                margin-bottom: 5px;
+              }
+              .grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+                margin-bottom: 30px;
+              }
+              .font-bold { font-weight: bold; }
+              .mb-2 { margin-bottom: 8px; }
+              .mb-4 { margin-bottom: 16px; }
+              .text-center { text-align: center; }
+              .text-right { text-align: right; }
+              .border { border: 1px solid #d1d5db; }
+              .p-2 { padding: 8px; }
+              .p-4 { padding: 16px; }
+              .bg-gray-50 { background-color: #f9f9fa; }
+              .items-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 30px;
+              }
+              .items-table th {
+                background: #f8f9fa;
+                border: 1px solid #333;
+                padding: 12px 8px;
+                text-align: left;
+                font-weight: bold;
+                font-size: 12px;
+              }
+              .items-table td {
+                border: 1px solid #333;
+                padding: 12px 8px;
+                font-size: 11px;
+              }
+              .total-section {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 30px;
+              }
+              .total-table {
+                width: 300px;
+                margin-left: auto;
+              }
+              .total-table td {
+                border: 1px solid #333;
+                padding: 8px 12px;
+                font-size: 12px;
+              }
+              .total-table .label {
+                font-weight: bold;
+                background: #f8f9fa;
+                width: 60%;
+              }
+              .gst-highlight {
+                background-color: #e8f5e8;
+                border: 2px solid #28a745;
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+              }
+              .action-buttons {
+                text-align: center;
+                margin: 30px 0;
+              }
+              .btn {
+                background: #28a745;
+                color: white;
+                border: none;
+                padding: 12px 25px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 16px;
+                margin: 0 10px;
+                text-decoration: none;
+                display: inline-block;
+              }
+              .btn:hover {
+                background: #1e7e34;
+              }
+              @media print {
+                .no-print { display: none !important; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div class="company-name">GHANSHYAM MURTI BHANDAR</div>
+              <div class="gst-bill-title">GST TAX INVOICE</div>
+              <div style="font-size: 14px;">(Original for Recipient)</div>
+            </div>
+
+            <div class="grid">
+              <div>
+                <div class="font-bold mb-2">Sold By:</div>
+                <div class="font-bold">GHANSHYAM MURTI BHANDAR</div>
+                <div>CANAL ROAD vasudhra soc, block no 193, near</div>
+                <div>jilla garden cancal road</div>
+                <div>Rajkot, GUJARAT, 360002</div>
+                <div>GSTIN: 24BYAPD0171N1ZP</div>
+                <div>PAN: BYAPD0171N</div>
+              </div>
+              <div>
+                <div class="font-bold mb-2">Bill To:</div>
+                <div class="font-bold">${invoice.customerDetails?.name || 'Customer'}</div>
+                <div>${invoice.customerDetails?.billingAddress?.street || 'Address'}</div>
+                <div>${invoice.customerDetails?.billingAddress?.city || 'City'}, ${invoice.customerDetails?.billingAddress?.state || 'State'}</div>
+                <div>GSTIN: ${gstNumber}</div>
+                <div>Phone: ${invoice.customerDetails?.phone || 'N/A'}</div>
+              </div>
+            </div>
+
+            <div class="gst-highlight">
+              <div class="font-bold text-center">GST BILL DETAILS</div>
+              <div style="text-align: center; margin-top: 5px;">
+                Invoice No: ${invoice.invoiceNumber || 'INV-' + orderId.slice(-6)} | 
+                Date: ${new Date(invoice.createdAt || Date.now()).toLocaleDateString('en-IN')}
+              </div>
+            </div>
+
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Sl.</th>
+                  <th>Description</th>
+                  <th>HSN Code</th>
+                  <th>Qty</th>
+                  <th>Rate</th>
+                  <th>Taxable Value</th>
+                  <th>CGST</th>
+                  <th>SGST</th>
+                  <th>IGST</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${invoice.items?.map((item: any, index: number) => {
+                  const taxableValue = item.taxableAmount || (item.rate * item.quantity);
+                  const cgst = item.cgst || 0;
+                  const sgst = item.sgst || 0;
+                  const igst = item.igst || 0;
+                  const total = item.totalAmount || (taxableValue + cgst + sgst + igst);
+                  
+                  return `
+                    <tr>
+                      <td>${index + 1}</td>
+                      <td>${item.name || 'Product'}</td>
+                      <td>${item.hsnCode || '9999'}</td>
+                      <td>${item.quantity || 1}</td>
+                      <td>₹${(item.rate || 0).toFixed(2)}</td>
+                      <td>₹${taxableValue.toFixed(2)}</td>
+                      <td>₹${cgst.toFixed(2)}</td>
+                      <td>₹${sgst.toFixed(2)}</td>
+                      <td>₹${igst.toFixed(2)}</td>
+                      <td>₹${total.toFixed(2)}</td>
+                    </tr>
+                  `;
+                }).join('') || `
+                  <tr>
+                    <td>1</td>
+                    <td>Product/Service</td>
+                    <td>9999</td>
+                    <td>1</td>
+                    <td>₹0.00</td>
+                    <td>₹0.00</td>
+                    <td>₹0.00</td>
+                    <td>₹0.00</td>
+                    <td>₹0.00</td>
+                    <td>₹0.00</td>
+                  </tr>
+                `}
+              </tbody>
+            </table>
+
+            <div class="total-section">
+              <div></div>
+              <div class="total-table">
+                <table>
+                  <tr>
+                    <td class="label">Sub Total:</td>
+                    <td>₹${(invoice.pricing?.subtotal || 0).toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">CGST:</td>
+                    <td>₹${(invoice.pricing?.totalCGST || 0).toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">SGST:</td>
+                    <td>₹${(invoice.pricing?.totalSGST || 0).toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">IGST:</td>
+                    <td>₹${(invoice.pricing?.totalIGST || 0).toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Total GST:</td>
+                    <td>₹${(invoice.pricing?.totalGST || 0).toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Shipping:</td>
+                    <td>₹${(invoice.pricing?.shippingCharges || 0).toFixed(2)}</td>
+                  </tr>
+                  <tr style="background: #f8f9fa; font-weight: bold;">
+                    <td class="label">Grand Total:</td>
+                    <td>₹${(invoice.pricing?.grandTotal || 0).toFixed(2)}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <div style="margin-top: 40px; text-align: center;">
+              <div style="font-weight: bold; margin-bottom: 20px;">For GHANSHYAM MURTI BHANDAR</div>
+              <div style="border-top: 1px solid #333; padding-top: 10px;">Authorized Signatory</div>
+            </div>
+
+            <div class="action-buttons no-print">
+              <button class="btn" onclick="window.print()">🖨️ Print GST Bill</button>
+              <button class="btn" onclick="window.close()" style="background: #6c757d;">❌ Close</button>
+            </div>
+          </body>
+          </html>
+        `);
+        billWindow.document.close();
+      }
+      
+      toast.success('GST bill generated successfully');
+    } catch (error) {
+      toast.error('Failed to generate GST bill');
+      console.error('GST bill generation error:', error);
+    } finally {
+      setGeneratingGstBill(null);
     }
   };
 
@@ -450,8 +750,8 @@ export default function OrdersPage() {
                 const orderStatus = order.status || 'pending';
                 const orderTotal = order.pricing?.total ||
                                  order.total ||
-                                 order.finalAmount ||
-                                 order.total_amount ||
+                                 (order as any).finalAmount ||
+                                 (order as any).total_amount ||
                                  (Array.isArray(order.items) ?
                                    order.items.reduce((sum: number, item: any) =>
                                      sum + ((item.totalPrice || item.unitPrice || item.price || 0) * (item.quantity || 1)), 0
@@ -590,7 +890,7 @@ export default function OrdersPage() {
                       {formatDate(orderDate)}
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         <Button
                           variant="outline"
                           size="sm"
@@ -599,6 +899,34 @@ export default function OrdersPage() {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
+                        
+                        {/* GST Bill Generation */}
+                        <div className="flex flex-col gap-1">
+                          <Input
+                            placeholder="Customer GST No"
+                            value={gstNumbers[orderId] || ''}
+                            onChange={(e) => setGstNumbers(prev => ({
+                              ...prev,
+                              [orderId]: e.target.value
+                            }))}
+                            className="w-32 h-8 text-xs"
+                            maxLength={15}
+                          />
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            title="Generate GST Bill"
+                            onClick={() => generateGstBill(orderId)}
+                            disabled={generatingGstBill === orderId || !gstNumbers[orderId]}
+                            className="w-32 h-6 text-xs"
+                          >
+                            {generatingGstBill === orderId ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              'GST Bill'
+                            )}
+                          </Button>
+                        </div>
 
                         {/* Manual Delivery: Show status dropdown for manual control */}
                         {(!order.shipping?.deliveryMethod || order.shipping?.deliveryMethod === 'manual') && (
