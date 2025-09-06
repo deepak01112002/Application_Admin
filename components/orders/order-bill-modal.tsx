@@ -577,8 +577,8 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
                 margin: 0 !important;
                 padding: 0 !important;
                 overflow: hidden !important;
-                font-size: 7px !important;
-                line-height: 1.1 !important;
+                font-size: 14px !important;
+                line-height: 1.3 !important;
                 max-height: 14cm !important;
                 min-height: 14cm !important;
                 box-sizing: border-box !important;
@@ -2070,13 +2070,13 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
           style={{ 
             width: '9cm', 
             height: '14cm', 
-            fontSize: '7px', 
-            lineHeight: '1.1', 
+            fontSize: '14px', 
+            lineHeight: '1.3', 
             overflow: 'hidden',
             pageBreakInside: 'avoid',
             breakInside: 'avoid',
             margin: '0',
-            padding: '0.1cm',
+            padding: '0.2cm',
             position: 'relative',
             border: '1px solid #000',
             maxHeight: '14cm',
@@ -2085,64 +2085,64 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
           }}
         >
           {/* Top Section: Customer Address (Left) + Delhivery (Right) */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.05cm', height: '2.5cm', margin: '0' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.1cm', height: '6.5cm', margin: '0' }}>
             {/* Left: Customer Address */}
-            <div style={{ border: '1px solid #000', padding: '0.05cm', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px', fontSize: '8px' }}>Customer Address</div>
-              <div style={{ fontWeight: 'bold', textTransform: 'lowercase', fontSize: '9px' }}>{customerName}</div>
-              <div style={{ whiteSpace: 'pre-line', fontSize: '7px', marginTop: '2px' }}>{shippingAddress}</div>
-              <div style={{ fontSize: '7px', marginTop: '2px' }}>{shippingCity}, {shippingState}, {shippingPincode}</div>
+            <div style={{ border: '1px solid #000', padding: '0.2cm', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '16px' }}>Customer Address</div>
+              <div style={{ fontWeight: 'bold', textTransform: 'lowercase', fontSize: '18px', marginBottom: '8px' }}>{customerName}</div>
+              <div style={{ whiteSpace: 'pre-line', fontSize: '14px', marginTop: '8px', lineHeight: '1.3' }}>{shippingAddress}</div>
+              <div style={{ fontSize: '14px', marginTop: '8px' }}>{shippingCity}, {shippingState}, {shippingPincode}</div>
           </div>
 
             {/* Right: Delhivery block */}
-            <div style={{ border: '1px solid #000', padding: '0.05cm', height: '100%', position: 'relative', boxSizing: 'border-box' }}>
+            <div style={{ border: '1px solid #000', padding: '0.2cm', height: '100%', position: 'relative', boxSizing: 'border-box' }}>
               {/* COD banner */}
-              <div style={{ background: '#000', color: 'white', textAlign: 'center', height: '0.2cm', lineHeight: '0.2cm', fontWeight: 700, marginBottom: '0.05cm', fontSize: '6px' }}>
+              <div style={{ background: '#000', color: 'white', textAlign: 'center', height: '0.5cm', lineHeight: '0.5cm', fontWeight: 700, marginBottom: '0.2cm', fontSize: '12px' }}>
                 COD: Check the payable amount on
             </div>
-              <div style={{ fontWeight: 'bold', fontSize: '9px' }}>Delhivery</div>
-              <div style={{ display: 'inline-block', color: 'white', fontSize: '6px', padding: '1px 3px', marginTop: '2px', background: '#000', borderRadius: '1px' }}>Pickup</div>
-              <div style={{ fontSize: '6px', marginTop: '2px' }}>Destination Code</div>
-              <div style={{ fontSize: '6px', marginTop: '2px' }}>Return Code</div>
-              <div style={{ fontSize: '7px', fontWeight: 600 }}>360002,2155544</div>
+              <div style={{ fontWeight: 'bold', fontSize: '18px', marginBottom: '8px' }}>Delhivery</div>
+              <div style={{ display: 'inline-block', color: 'white', fontSize: '12px', padding: '4px 8px', marginTop: '8px', background: '#000', borderRadius: '3px' }}>Pickup</div>
+              <div style={{ fontSize: '12px', marginTop: '8px' }}>Destination Code</div>
+              <div style={{ fontSize: '12px', marginTop: '8px' }}>Return Code</div>
+              <div style={{ fontSize: '14px', fontWeight: 600, marginTop: '8px' }}>360002,2155544</div>
             </div>
           </div>
 
           {/* Middle Section: Return Address (Left) + Codes/QR/Barcode (Right) */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.05cm', marginTop: '0.05cm', height: '2.5cm' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.1cm', marginTop: '0.1cm', height: '6.5cm' }}>
             {/* Left: Return Address */}
-            <div style={{ border: '1px solid #000', padding: '0.05cm', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ fontSize: '6px', marginBottom: '2px' }}>If undelivered, return to:</div>
-              <div style={{ fontWeight: 'bold', fontSize: '7px' }}>GHANSHYAM MURATI BHANDAR</div>
-              <div style={{ whiteSpace: 'pre-line', fontSize: '6px' }}>SHREE VASHUNADHARA SOC. BLOCK NO
+            <div style={{ border: '1px solid #000', padding: '0.2cm', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ fontSize: '14px', marginBottom: '8px' }}>If undelivered, return to:</div>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>GHANSHYAM MURATI BHANDAR</div>
+              <div style={{ whiteSpace: 'pre-line', fontSize: '12px', lineHeight: '1.3' }}>SHREE VASHUNADHARA SOC. BLOCK NO
 193, CANCAL ROAD
 JILLA GARDEN
 rajkot, Gujarat, 360002</div>
           </div>
 
             {/* Right: Codes, QR, Barcode */}
-            <div style={{ border: '1px solid #000', padding: '0.05cm', height: '100%', boxSizing: 'border-box' }}>
+            <div style={{ border: '1px solid #000', padding: '0.2cm', height: '100%', boxSizing: 'border-box' }}>
               {/* QR Code */}
-              <div style={{ marginTop: '2px', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center' }}>
                 {qrCodeUrl ? (
-                  <img src={qrCodeUrl} alt="QR" style={{ width: '0.8cm', height: '0.8cm' }} />
+                  <img src={qrCodeUrl} alt="QR" style={{ width: '2cm', height: '2cm' }} />
                 ) : (
-                  <div style={{ width: '0.8cm', height: '0.8cm', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <QrCode className="h-3 w-3 text-gray-400" />
+                  <div style={{ width: '2cm', height: '2cm', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <QrCode className="h-6 w-6 text-gray-400" />
               </div>
             )}
             </div>
               
               {/* Order Number */}
-              <div style={{ textAlign: 'center', fontWeight: 600, fontSize: '7px', marginTop: '2px' }}>
+              <div style={{ textAlign: 'center', fontWeight: 600, fontSize: '14px', marginTop: '8px' }}>
                 {(order.orderNumber || order._id) as string}
           </div>
 
               {/* Barcode */}
-              <div style={{ marginTop: '2px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center' }}>
                 <img
                   alt="barcode"
-                  style={{ width: '100%', height: '0.4cm', objectFit: 'contain' }}
+                  style={{ width: '100%', height: '1cm', objectFit: 'contain' }}
                   src={`https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(
                     (order.orderNumber || order._id || '').toString()
                   )}&code=Code128&dpi=96`}
@@ -2150,8 +2150,6 @@ rajkot, Gujarat, 360002</div>
             </div>
               </div>
           </div>
-
-         
         </div>
 
         {/* Separate CSS to ensure thermal label fits exactly on 9cm x 14cm page */}
@@ -2198,12 +2196,14 @@ rajkot, Gujarat, 360002</div>
               width: 9cm !important;
               height: 14cm !important;
               margin: 0 !important;
-              padding: 0.1cm !important;
+              padding: 0.2cm !important;
               overflow: hidden !important;
               max-width: 9cm !important;
               max-height: 14cm !important;
               min-width: 9cm !important;
               min-height: 14cm !important;
+              font-size: 14px !important;
+              line-height: 1.3 !important;
             }
             
             #thermal-label {
