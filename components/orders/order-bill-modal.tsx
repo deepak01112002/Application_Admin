@@ -559,7 +559,7 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
             <title>Thermal Print - ${order?.orderNumber || order?._id}</title>
           <style>
             @page {
-              size: 9cm 14cm;
+              size: 4in 6in;
                 margin: 0;
                 padding: 0;
               }
@@ -572,23 +572,23 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
               }
               
             body {
-                width: 9cm !important;
-                height: 14cm !important;
+                width: 4in !important;
+                height: 6in !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 overflow: hidden !important;
-                font-size: 14px !important;
-                line-height: 1.3 !important;
-                max-height: 14cm !important;
-                min-height: 14cm !important;
+                font-size: 8px !important;
+                line-height: 1.2 !important;
+                max-height: 6in !important;
+                min-height: 6in !important;
                 box-sizing: border-box !important;
               }
               
               #thermal-label {
-                width: 9cm !important;
-                height: 14cm !important;
-                max-height: 14cm !important;
-                min-height: 14cm !important;
+                width: 4in !important;
+                height: 6in !important;
+                max-height: 6in !important;
+                min-height: 6in !important;
                 overflow: hidden !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
@@ -1701,6 +1701,386 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
     }
   };
 
+  const handlePackingDetails = () => {
+    console.log('Packing Details clicked');
+    console.log('Order:', order);
+    
+    // Create a simple placeholder image data URL
+    const placeholderImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjBGMEYwIi8+CjxwYXRoIGQ9Ik02MCA0MEM2NS41MjI4IDQwIDcwIDQ0LjQ3NzIgNzAgNTBDNzAgNTUuNTIyOCA2NS41MjI4IDYwIDYwIDYwQzU0LjQ3NzIgNjAgNTAgNTUuNTIyOCA1MCA1MEM1MCA0NC40NzcyIDU0LjQ3NzIgNDAgNjAgNDBaIiBmaWxsPSIjOTk5OTk5Ii8+CjxwYXRoIGQ9Ik02MCA3MEM2NS41MjI4IDcwIDcwIDc0LjQ3NzIgNzAgODBDNzAgODUuNTIyOCA2NS41MjI4IDkwIDYwIDkwQzU0LjQ3NzIgOTAgNTAgODUuNTIyOCA1MCA4MEM1MCA3NC40NzcyIDU0LjQ3NzIgNzAgNjAgNzBaIiBmaWxsPSIjOTk5OTk5Ii8+Cjx0ZXh0IHg9IjYwIiB5PSIxMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+Cjwvc3ZnPgo=';
+    
+    // Create a packing details window with order items and images
+    const packingWindow = window.open('', '_blank');
+    if (packingWindow) {
+      packingWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Packing Details - ${order?.orderNumber || order?._id}</title>
+          <style>
+            @page { 
+              size: A4; 
+              margin: 0.5in; 
+            }
+            
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-size: 12px;
+              line-height: 1.4;
+              margin: 0;
+              padding: 20px;
+              background: white;
+              color: #333;
+            }
+            
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 2px solid #333;
+              padding-bottom: 20px;
+            }
+            
+            .company-name {
+              font-size: 24px;
+              font-weight: bold;
+              margin-bottom: 10px;
+              color: #333;
+            }
+            
+            .packing-title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #28a745;
+              margin-bottom: 5px;
+            }
+            
+            .order-info {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 30px;
+              margin-bottom: 30px;
+              padding: 15px;
+              border: 1px solid #333;
+            }
+            
+            .info-section h3 {
+              margin: 0 0 15px 0;
+              font-size: 16px;
+              font-weight: bold;
+              color: #333;
+            }
+            
+            .info-section p {
+              margin: 5px 0;
+              font-size: 12px;
+              color: #666;
+            }
+            
+            .packing-items {
+              margin-bottom: 30px;
+            }
+            
+            .packing-items h3 {
+              margin: 0 0 20px 0;
+              font-size: 18px;
+              font-weight: bold;
+              color: #333;
+              text-align: center;
+              background: #f8f9fa;
+              padding: 15px;
+              border: 1px solid #333;
+            }
+            
+            .item-card {
+              display: flex;
+              border: 1px solid #333;
+              margin-bottom: 15px;
+              padding: 15px;
+              background: #f9f9f9;
+            }
+            
+            .item-image {
+              width: 120px;
+              height: 120px;
+              border: 1px solid #ddd;
+              margin-right: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: white;
+              flex-shrink: 0;
+            }
+            
+            .item-image img {
+              max-width: 100%;
+              max-height: 100%;
+              object-fit: contain;
+            }
+            
+            .item-details {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+            }
+            
+            .item-name {
+              font-size: 16px;
+              font-weight: bold;
+              margin-bottom: 8px;
+              color: #333;
+            }
+            
+            .item-specs {
+              font-size: 12px;
+              color: #666;
+              margin-bottom: 8px;
+            }
+            
+            .item-quantity {
+              font-size: 14px;
+              font-weight: bold;
+              color: #28a745;
+              background: #e8f5e8;
+              padding: 5px 10px;
+              border-radius: 4px;
+              display: inline-block;
+            }
+            
+            .packing-summary {
+              margin-top: 30px;
+              padding: 20px;
+              border: 2px solid #28a745;
+              background: #f8fff8;
+            }
+            
+            .summary-title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #28a745;
+              text-align: center;
+              margin-bottom: 15px;
+            }
+            
+            .summary-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 20px;
+            }
+            
+            .summary-item {
+              display: flex;
+              justify-content: space-between;
+              padding: 8px 0;
+              border-bottom: 1px solid #ddd;
+            }
+            
+            .summary-label {
+              font-weight: bold;
+            }
+            
+            .summary-value {
+              color: #333;
+            }
+            
+            .packing-instructions {
+              margin-top: 30px;
+              padding: 20px;
+              border: 1px solid #333;
+              background: #fff8e1;
+            }
+            
+            .instructions-title {
+              font-size: 16px;
+              font-weight: bold;
+              color: #f57c00;
+              margin-bottom: 15px;
+            }
+            
+            .instruction-list {
+              list-style: none;
+              padding: 0;
+            }
+            
+            .instruction-list li {
+              padding: 5px 0;
+              font-size: 12px;
+              color: #333;
+            }
+            
+            .instruction-list li:before {
+              content: "✓ ";
+              color: #28a745;
+              font-weight: bold;
+            }
+            
+            .no-print {
+              display: block;
+            }
+            
+            @media print {
+              .no-print {
+                display: none !important;
+              }
+            }
+            
+            .action-buttons {
+              text-align: center;
+              margin: 30px 0;
+            }
+            
+            .btn {
+              background: #28a745;
+              color: white;
+              border: none;
+              padding: 12px 25px;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 16px;
+              margin: 0 10px;
+              text-decoration: none;
+              display: inline-block;
+            }
+            
+            .btn:hover {
+              background: #1e7e34;
+            }
+            
+            .btn-secondary {
+              background: #6c757d;
+            }
+            
+            .btn-secondary:hover {
+              background: #545b62;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="company-name">GHANSHYAM MURTI BHANDAR</div>
+            <div class="packing-title">ORDER PACKING DETAILS</div>
+            <div style="font-size: 14px;">For Admin Packing Reference</div>
+          </div>
+
+          <div class="order-info">
+            <div class="info-section">
+              <h3>Order Information</h3>
+              <p><strong>Order Number:</strong> ${order?.orderNumber || order?._id}</p>
+              <p><strong>Order Date:</strong> ${formatDate(order?.createdAt)}</p>
+              <p><strong>Customer:</strong> ${customerName}</p>
+              <p><strong>Phone:</strong> ${customerPhone}</p>
+              <p><strong>Status:</strong> ${order?.status || 'Processing'}</p>
+            </div>
+            <div class="info-section">
+              <h3>Delivery Information</h3>
+              <p><strong>Address:</strong></p>
+              <p>${shippingAddress}</p>
+              <p>${shippingCity}, ${shippingState} - ${shippingPincode}</p>
+              <p><strong>Payment:</strong> ${order?.paymentMethod?.toUpperCase() || 'COD'}</p>
+              <p><strong>Total Amount:</strong> ₹${total.toFixed(2)}</p>
+            </div>
+          </div>
+
+          <div class="packing-items">
+            <h3>📦 ITEMS TO PACK</h3>
+            ${order?.items?.map((item: any, index: number) => {
+              const product = item.product || {};
+              const specs = product.specifications || {};
+              const imageUrl = item.productSnapshot?.images?.[0] || 
+                              product.images?.[0] || 
+                              '${placeholderImage}';
+              
+              return `
+                <div class="item-card">
+                  <div class="item-image">
+                    <img src="${imageUrl}" alt="${item.productSnapshot?.name || product.name || item.name || 'Product'}" 
+                         onerror="this.src='${placeholderImage}'">
+                  </div>
+                  <div class="item-details">
+                    <div class="item-name">${item.productSnapshot?.name || product.name || item.name || 'Product'}</div>
+                    <div class="item-specs">
+                      ${specs.material ? `Material: ${specs.material}` : ''}
+                      ${specs.height ? ` | Height: ${specs.height}` : ''}
+                      ${specs.weight ? ` | Weight: ${specs.weight}` : ''}
+                      ${specs.finish ? ` | Finish: ${specs.finish}` : ''}
+                    </div>
+                    <div class="item-quantity">Quantity: ${item.quantity || 1}</div>
+                  </div>
+                </div>
+              `;
+            }).join('') || `
+              <div class="item-card">
+                <div class="item-image">
+                  <img src="${placeholderImage}" alt="No items">
+                </div>
+                <div class="item-details">
+                  <div class="item-name">No items found</div>
+                  <div class="item-specs">Please check order details</div>
+                  <div class="item-quantity">Quantity: 0</div>
+                </div>
+              </div>
+            `}
+          </div>
+
+          <div class="packing-summary">
+            <div class="summary-title">📋 PACKING SUMMARY</div>
+            <div class="summary-grid">
+              <div>
+                <div class="summary-item">
+                  <span class="summary-label">Total Items:</span>
+                  <span class="summary-value">${order?.items?.length || 0}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Total Quantity:</span>
+                  <span class="summary-value">${order?.items?.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0) || 0}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Order Value:</span>
+                  <span class="summary-value">₹${total.toFixed(2)}</span>
+                </div>
+              </div>
+              <div>
+                <div class="summary-item">
+                  <span class="summary-label">Customer:</span>
+                  <span class="summary-value">${customerName}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Phone:</span>
+                  <span class="summary-value">${customerPhone}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Payment:</span>
+                  <span class="summary-value">${order?.paymentMethod?.toUpperCase() || 'COD'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="packing-instructions">
+            <div class="instructions-title">📝 PACKING INSTRUCTIONS</div>
+            <ul class="instruction-list">
+              <li>Verify all items match the order details</li>
+              <li>Check product quality and condition before packing</li>
+              <li>Use appropriate packaging materials for fragile items</li>
+              <li>Include invoice copy in the package</li>
+              <li>Seal package securely with proper labels</li>
+              <li>Update order status to 'Packed' after completion</li>
+              <li>Hand over to shipping partner with tracking details</li>
+            </ul>
+          </div>
+
+          <div class="action-buttons no-print">
+            <button class="btn" onclick="window.print()">🖨️ Print Packing Details</button>
+            <button class="btn btn-secondary" onclick="window.close()">❌ Close</button>
+          </div>
+        </body>
+        </html>
+      `);
+      packingWindow.document.close();
+    } else {
+      alert('Failed to open packing details window. Please check popup blockers.');
+    }
+  };
+
   if (!order) return null;
 
   const formatDate = (date: string) => {
@@ -1753,10 +2133,8 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
   }
 
   const tax = order.pricing?.tax || order.tax || calculatedTax;
-  const shipping = order.pricing?.shipping || 
-                  order.shippingCharges || 
-                  (typeof order.shipping === 'object' ? order.shipping?.shippingCost || 0 : order.shipping) || 
-                  0;
+  // Force shipping charges to zero as per business requirement
+  const shipping = 0;
   const discount = order.pricing?.discount || order.discountAmount || order.discount || 0;
 
   // Enhanced total calculation with multiple fallbacks
@@ -1806,7 +2184,7 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
             
             <Button onClick={handleThermalPrint} variant="outline">
               <Printer className="h-4 w-4 mr-2" />
-              Print Thermal (9x14cm)
+              Print Thermal (4x6)
             </Button>
             
             <Button onClick={handleEstimateBill} variant="secondary">
@@ -1823,6 +2201,12 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
               <Download className="h-4 w-4 mr-2" />
               Download A4
             </Button>
+            
+            <Button onClick={handlePackingDetails} variant="secondary">
+              <Printer className="h-4 w-4 mr-2" />
+              Packing Details
+            </Button>
+            
             <Button onClick={onClose} variant="ghost" size="sm">
               <X className="h-4 w-4" />
             </Button>
@@ -2063,86 +2447,87 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
           </div>
         </div>
 
-        {/* Thermal Shipping Label (9cm x 14cm) - Optimized for new dimensions */}
+        {/* Thermal Shipping Label (4x6 in) - Exact format from image */}
         <div id="thermal-label"
           ref={thermalBillRef}
           className="bg-white text-black hidden"
           style={{ 
-            width: '9cm', 
-            height: '14cm', 
-            fontSize: '14px', 
-            lineHeight: '1.3', 
+            width: '4in', 
+            height: '6in', 
+            fontSize: '8px', 
+            lineHeight: '1.2', 
             overflow: 'hidden',
             pageBreakInside: 'avoid',
             breakInside: 'avoid',
             margin: '0',
-            padding: '0.2cm',
+            padding: '0.05in',
             position: 'relative',
             border: '1px solid #000',
-            maxHeight: '14cm',
-            minHeight: '14cm',
+            maxHeight: '6in',
+            minHeight: '6in',
             boxSizing: 'border-box'
           }}
         >
           {/* Top Section: Customer Address (Left) + Delhivery (Right) */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.1cm', height: '6.5cm', margin: '0' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.002in', height: '1.2in', margin: '0' }}>
             {/* Left: Customer Address */}
-            <div style={{ border: '1px solid #000', padding: '0.2cm', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '16px' }}>Customer Address</div>
-              <div style={{ fontWeight: 'bold', textTransform: 'lowercase', fontSize: '18px', marginBottom: '8px' }}>{customerName}</div>
-              <div style={{ whiteSpace: 'pre-line', fontSize: '14px', marginTop: '8px', lineHeight: '1.3' }}>{shippingAddress}</div>
-              <div style={{ fontSize: '14px', marginTop: '8px' }}>{shippingCity}, {shippingState}, {shippingPincode}</div>
+            <div style={{ border: '1px solid #000', padding: '0.01in', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '3px', fontSize: '10px' }}>Customer Address</div>
+              <div style={{ fontWeight: 'bold', textTransform: 'lowercase', fontSize: '11px' }}>{customerName}</div>
+              <div style={{ whiteSpace: 'pre-line', fontSize: '9px', marginTop: '3px' }}>{shippingAddress}</div>
+              <div style={{ fontSize: '9px', marginTop: '3px' }}>{shippingCity}, {shippingState}, {shippingPincode}</div>
+              <div style={{ fontSize: '9px', marginTop: '3px', fontWeight: 'bold' }}>Phone: {customerPhone}</div>
           </div>
 
             {/* Right: Delhivery block */}
-            <div style={{ border: '1px solid #000', padding: '0.2cm', height: '100%', position: 'relative', boxSizing: 'border-box' }}>
+            <div style={{ border: '1px solid #000', padding: '0.01in', height: '100%', position: 'relative', boxSizing: 'border-box' }}>
               {/* COD banner */}
-              <div style={{ background: '#000', color: 'white', textAlign: 'center', height: '0.5cm', lineHeight: '0.5cm', fontWeight: 700, marginBottom: '0.2cm', fontSize: '12px' }}>
+              <div style={{ background: '#000', color: 'white', textAlign: 'center', height: '0.1in', lineHeight: '0.1in', fontWeight: 700, marginBottom: '0.003in', fontSize: '8px' }}>
                 COD: Check the payable amount on
             </div>
-              <div style={{ fontWeight: 'bold', fontSize: '18px', marginBottom: '8px' }}>Delhivery</div>
-              <div style={{ display: 'inline-block', color: 'white', fontSize: '12px', padding: '4px 8px', marginTop: '8px', background: '#000', borderRadius: '3px' }}>Pickup</div>
-              <div style={{ fontSize: '12px', marginTop: '8px' }}>Destination Code</div>
-              <div style={{ fontSize: '12px', marginTop: '8px' }}>Return Code</div>
-              <div style={{ fontSize: '14px', fontWeight: 600, marginTop: '8px' }}>360002,2155544</div>
+              <div style={{ fontWeight: 'bold', fontSize: '11px' }}>Delhivery</div>
+              <div style={{ display: 'inline-block', color: 'white', fontSize: '7px', padding: '2px 4px', marginTop: '3px', background: '#000', borderRadius: '2px' }}>Pickup</div>
+              <div style={{ fontSize: '7px', marginTop: '3px' }}>Destination Code</div>
+              <div style={{ fontSize: '7px', marginTop: '3px' }}>Return Code</div>
+              <div style={{ fontSize: '8px', fontWeight: 600 }}>360002,2155544</div>
             </div>
           </div>
 
           {/* Middle Section: Return Address (Left) + Codes/QR/Barcode (Right) */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.1cm', marginTop: '0.1cm', height: '6.5cm' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.002in', marginTop: '0.002in', height: '1.2in' }}>
             {/* Left: Return Address */}
-            <div style={{ border: '1px solid #000', padding: '0.2cm', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ fontSize: '14px', marginBottom: '8px' }}>If undelivered, return to:</div>
-              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>GHANSHYAM MURATI BHANDAR</div>
-              <div style={{ whiteSpace: 'pre-line', fontSize: '12px', lineHeight: '1.3' }}>SHREE VASHUNADHARA SOC. BLOCK NO
+            <div style={{ border: '1px solid #000', padding: '0.01in', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ fontSize: '8px', marginBottom: '3px' }}>If undelivered, return to:</div>
+              <div style={{ fontWeight: 'bold', fontSize: '9px' }}>GHANSHYAM MURATI BHANDAR</div>
+              <div style={{ whiteSpace: 'pre-line', fontSize: '7px' }}>SHREE VASHUNADHARA SOC. BLOCK NO
 193, CANCAL ROAD
 JILLA GARDEN
 rajkot, Gujarat, 360002</div>
           </div>
 
             {/* Right: Codes, QR, Barcode */}
-            <div style={{ border: '1px solid #000', padding: '0.2cm', height: '100%', boxSizing: 'border-box' }}>
+            <div style={{ border: '1px solid #000', padding: '0.01in', height: '100%', boxSizing: 'border-box' }}>
               {/* QR Code */}
-              <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ marginTop: '3px', display: 'flex', justifyContent: 'center' }}>
                 {qrCodeUrl ? (
-                  <img src={qrCodeUrl} alt="QR" style={{ width: '2cm', height: '2cm' }} />
+                  <img src={qrCodeUrl} alt="QR" style={{ width: '0.4in', height: '0.4in' }} />
                 ) : (
-                  <div style={{ width: '2cm', height: '2cm', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <QrCode className="h-6 w-6 text-gray-400" />
+                  <div style={{ width: '0.4in', height: '0.4in', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <QrCode className="h-3 w-3 text-gray-400" />
               </div>
             )}
             </div>
               
               {/* Order Number */}
-              <div style={{ textAlign: 'center', fontWeight: 600, fontSize: '14px', marginTop: '8px' }}>
+              <div style={{ textAlign: 'center', fontWeight: 600, fontSize: '9px', marginTop: '3px' }}>
                 {(order.orderNumber || order._id) as string}
           </div>
 
               {/* Barcode */}
-              <div style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ marginTop: '3px', width: '100%', display: 'flex', justifyContent: 'center' }}>
                 <img
                   alt="barcode"
-                  style={{ width: '100%', height: '1cm', objectFit: 'contain' }}
+                  style={{ width: '100%', height: '0.2in', objectFit: 'contain' }}
                   src={`https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(
                     (order.orderNumber || order._id || '').toString()
                   )}&code=Code128&dpi=96`}
@@ -2150,17 +2535,19 @@ rajkot, Gujarat, 360002</div>
             </div>
               </div>
           </div>
+
+         
         </div>
 
-        {/* Separate CSS to ensure thermal label fits exactly on 9cm x 14cm page */}
+        {/* Separate CSS to ensure thermal label fits exactly on 4x6 page */}
         <style jsx>{`
           #thermal-label {
-            width: 9cm !important;
-            height: 14cm !important;
-            max-width: 9cm !important;
-            max-height: 14cm !important;
-            min-width: 9cm !important;
-            min-height: 14cm !important;
+            width: 4in !important;
+            height: 6in !important;
+            max-width: 4in !important;
+            max-height: 6in !important;
+            min-width: 4in !important;
+            min-height: 6in !important;
             overflow: hidden !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
@@ -2187,32 +2574,30 @@ rajkot, Gujarat, 360002</div>
           
           @media print {
             @page {
-              size: 9cm 14cm !important;
+              size: 4in 6in !important;
               margin: 0 !important;
               padding: 0 !important;
             }
             
             html, body {
-              width: 9cm !important;
-              height: 14cm !important;
+              width: 4in !important;
+              height: 6in !important;
               margin: 0 !important;
-              padding: 0.2cm !important;
+              padding: 0.05in !important;
               overflow: hidden !important;
-              max-width: 9cm !important;
-              max-height: 14cm !important;
-              min-width: 9cm !important;
-              min-height: 14cm !important;
-              font-size: 14px !important;
-              line-height: 1.3 !important;
+              max-width: 4in !important;
+              max-height: 6in !important;
+              min-width: 4in !important;
+              min-height: 6in !important;
             }
             
             #thermal-label {
-              width: 9cm !important;
-              height: 14cm !important;
-              max-width: 9cm !important;
-              max-height: 14cm !important;
-              min-width: 9cm !important;
-              min-height: 14cm !important;
+              width: 4in !important;
+              height: 6in !important;
+              max-width: 4in !important;
+              max-height: 6in !important;
+              min-width: 4in !important;
+              min-height: 6in !important;
               overflow: hidden !important;
               page-break-inside: avoid !important;
               break-inside: avoid !important;
