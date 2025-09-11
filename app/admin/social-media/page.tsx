@@ -579,8 +579,8 @@ const SocialMediaModal = ({
     showOnMobile: true,
     showOnWeb: true,
     whatsappConfig: {
-      phoneNumber: '',
-      defaultMessage: 'Hello! I am interested in your products.'
+      phoneNumber: '8000950408',
+      defaultMessage: 'Hello! I am interested in your products from Ghanshyam Murti Bhandar.'
     }
   });
   const [loading, setLoading] = useState(false);
