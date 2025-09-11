@@ -55,8 +55,8 @@ export default function EstimateModal({ isOpen, onClose, estimate, onSuccess }: 
   const [formData, setFormData] = useState({
     companyDetails: {
       name: "Ghanshyam Murti Bhandar",
-      address: "Shree Vashunadhara Soc. Block No 153, Cancal Road, Jilla Garden, Rajkot, Gujarat, 360002",
-      phone: "+91 9999999999",
+      address: "Pujara Plot Main Rd, near chirag medical, Lakshmiwadi, Bhakti Nagar, Rajkot, Gujarat, 360001",
+      phone: "8000950408",
       email: "info@ghanshyammurtibhandar.com",
       gstin: "24XXXXX1234X1ZX"
     },

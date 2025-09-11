@@ -452,9 +452,9 @@ export default function OrdersPage() {
               <div>
                 <div class="font-bold mb-2">Sold By:</div>
                 <div class="font-bold">GHANSHYAM MURTI BHANDAR</div>
-                <div>CANAL ROAD vasudhra soc, block no 193, near</div>
-                <div>jilla garden cancal road</div>
-                <div>Rajkot, GUJARAT, 360002</div>
+                <div>Pujara Plot Main Rd, near chirag medical, Lakshmiwadi, Bhakti Nagar</div>
+                <div>Rajkot, Gujarat, 360001</div>
+                <div>Phone: 8000950408</div>
                 <div>GSTIN: 24BYAPD0171N1ZP</div>
                 <div>PAN: BYAPD0171N</div>
               </div>

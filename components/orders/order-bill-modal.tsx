@@ -781,9 +781,9 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
             <div>
               <div class="font-bold mb-2">Sold By:</div>
               <div class="font-bold">GHANSHYAM MURTI BHANDAR</div>
-              <div>CANAL ROAD vasudhra soc, block no 193, near</div>
-              <div>jilla garden cancal road</div>
-              <div>Rajkot, GUJARAT, 360002</div>
+              <div>Pujara Plot Main Rd, near chirag medical, Lakshmiwadi, Bhakti Nagar</div>
+              <div>Rajkot, Gujarat, 360001</div>
+              <div>Phone: 8000950408</div>
               <div>GSTIN: 24BYAPD0171N1ZP</div>
               <div>PAN: BYAPD0171N</div>
             </div>
@@ -1144,10 +1144,9 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
           <div class="company-section">
             <div class="company-info">
               <h3>GHANSHYAM MURTI BHANDAR</h3>
-              <p>CANAL ROAD vasudhra soc, block no 193, near</p>
-              <p>jilla garden cancal road</p>
-              <p>Rajkot, GUJARAT, 360002</p>
-              <p>Phone: +91-XXXXXXXXXX</p>
+              <p>Pujara Plot Main Rd, near chirag medical, Lakshmiwadi, Bhakti Nagar</p>
+              <p>Rajkot, Gujarat, 360001</p>
+              <p>Phone: 8000950408</p>
               <p>Email: info@ghanshyammurti.com</p>
               <p>PAN: BYAPD0171N</p>
               <p>GST: 24BYAPD0171N1ZP</p>
@@ -2228,9 +2227,9 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
             <div>
               <div className="font-bold mb-2">Sold By:</div>
               <div className="font-bold">GHANSHYAM MURTI BHANDAR</div>
-              <div>CANAL ROAD vasudhra soc, block no 193, near</div>
-              <div>jilla garden cancal road</div>
-              <div>Rajkot, GUJARAT, 360002</div>
+              <div>Pujara Plot Main Rd, near chirag medical, Lakshmiwadi, Bhakti Nagar</div>
+              <div>Rajkot, Gujarat, 360001</div>
+              <div>Phone: 8000950408</div>
               <div>IN</div>
               <div className="mt-2">
                 <div>PAN No: BYAPD0171N</div>
@@ -2460,7 +2459,7 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
             pageBreakInside: 'avoid',
             breakInside: 'avoid',
             margin: '0',
-            padding: '0.1in',
+            padding: '0.08in',
             position: 'relative',
             border: '1px solid #000',
             maxHeight: '6in',
@@ -2471,16 +2470,16 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
           {/* Top Section: Customer Address (Left) + Delhivery (Right) */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.002in', height: '2.8in', margin: '0' }}>
             {/* Left: Customer Address */}
-            <div style={{ border: '1px solid #000', padding: '0.05in', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '12px' }}>Customer Address</div>
-              <div style={{ fontWeight: 'bold', textTransform: 'lowercase', fontSize: '14px', marginBottom: '8px' }}>{customerName}</div>
-              <div style={{ whiteSpace: 'pre-line', fontSize: '11px', marginTop: '8px', lineHeight: '1.3' }}>{shippingAddress}</div>
-              <div style={{ fontSize: '11px', marginTop: '8px' }}>{shippingCity}, {shippingState}, {shippingPincode}</div>
-              <div style={{ fontSize: '11px', marginTop: '8px', fontWeight: 'bold' }}>Phone: {customerPhone}</div>
+            <div style={{ border: '1px solid #000', padding: '0.06in', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '6px', fontSize: '12px' }}>Customer Address</div>
+              <div style={{ fontWeight: 'bold', textTransform: 'lowercase', fontSize: '14px', marginBottom: '6px' }}>{customerName}</div>
+              <div style={{ whiteSpace: 'pre-line', fontSize: '11px', marginTop: '6px', lineHeight: '1.2' }}>{shippingAddress}</div>
+              <div style={{ fontSize: '11px', marginTop: '6px' }}>{shippingCity}, {shippingState}, {shippingPincode}</div>
+              <div style={{ fontSize: '11px', marginTop: '6px', fontWeight: 'bold' }}>Phone: {customerPhone}</div>
           </div>
 
             {/* Right: Delhivery block */}
-            <div style={{ border: '1px solid #000', padding: '0.05in', height: '100%', position: 'relative', boxSizing: 'border-box' }}>
+            <div style={{ border: '1px solid #000', padding: '0.06in', height: '100%', position: 'relative', boxSizing: 'border-box' }}>
               {/* COD banner */}
               <div style={{ background: '#000', color: 'white', textAlign: 'center', height: '0.2in', lineHeight: '0.2in', fontWeight: 700, marginBottom: '0.1in', fontSize: '10px' }}>
                 COD: Check the payable amount on
@@ -2489,24 +2488,24 @@ export function OrderBillModal({ isOpen, onClose, order }: OrderBillModalProps) 
               <div style={{ display: 'inline-block', color: 'white', fontSize: '10px', padding: '4px 8px', marginTop: '8px', background: '#000', borderRadius: '3px' }}>Pickup</div>
               <div style={{ fontSize: '10px', marginTop: '8px' }}>Destination Code</div>
               <div style={{ fontSize: '10px', marginTop: '8px' }}>Return Code</div>
-              <div style={{ fontSize: '11px', fontWeight: 600, marginTop: '8px' }}>360002,2155544</div>
+              <div style={{ fontSize: '11px', fontWeight: 600, marginTop: '8px' }}>360001,2155544</div>
             </div>
           </div>
 
           {/* Middle Section: Return Address (Left) + Codes/QR/Barcode (Right) */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '0.002in', marginTop: '0.002in', height: '2.8in' }}>
             {/* Left: Return Address */}
-            <div style={{ border: '1px solid #000', padding: '0.05in', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ fontSize: '11px', marginBottom: '8px' }}>If undelivered, return to:</div>
-              <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '8px' }}>GHANSHYAM MURATI BHANDAR</div>
-              <div style={{ whiteSpace: 'pre-line', fontSize: '10px', lineHeight: '1.3' }}>SHREE VASHUNADHARA SOC. BLOCK NO
-193, CANCAL ROAD
-JILLA GARDEN
-rajkot, Gujarat, 360002</div>
+            <div style={{ border: '1px solid #000', padding: '0.06in', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ fontSize: '11px', marginBottom: '6px' }}>If undelivered, return to:</div>
+              <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '6px' }}>GHANSHYAM MURTI BHANDAR</div>
+              <div style={{ whiteSpace: 'pre-line', fontSize: '10px', lineHeight: '1.2' }}>PUJARA PLOT MAIN RD, NEAR CHIRAG MEDICAL
+LAKSHMIWADI, BHAKTI NAGAR
+RAJKOT, GUJARAT, 360001</div>
+              <div style={{ fontSize: '10px', marginTop: '6px', fontWeight: 'bold' }}>Phone: 8000950408</div>
           </div>
 
             {/* Right: Codes, QR, Barcode */}
-            <div style={{ border: '1px solid #000', padding: '0.05in', height: '100%', boxSizing: 'border-box' }}>
+            <div style={{ border: '1px solid #000', padding: '0.06in', height: '100%', boxSizing: 'border-box' }}>
               {/* QR Code */}
               <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center' }}>
                 {qrCodeUrl ? (
@@ -2583,7 +2582,7 @@ rajkot, Gujarat, 360002</div>
               width: 4in !important;
               height: 6in !important;
               margin: 0 !important;
-              padding: 0.1in !important;
+              padding: 0.08in !important;
               overflow: hidden !important;
               max-width: 4in !important;
               max-height: 6in !important;
